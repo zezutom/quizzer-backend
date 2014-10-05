@@ -1,0 +1,5 @@
+eclipse-launch-profiles
+*.iml
+.idea
+nbactions.xml
+target
