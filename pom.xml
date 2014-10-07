@@ -12,6 +12,7 @@
         <appengine.app.version>1</appengine.app.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>4.1.1.RELEASE</spring.version>
+        <spring.test.version>3.2.6.RELEASE</spring.test.version> <!--Spring 4 only drops support of servlet api 2.5 -->
         <jackson.version>2.4.2</jackson.version>
         <oauth.version>2.0.3.RELEASE</oauth.version>
     </properties>
@@ -108,7 +109,19 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>0.9.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

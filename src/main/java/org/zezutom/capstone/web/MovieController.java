@@ -23,12 +23,6 @@ import java.util.Map;
 @RequestMapping("api")
 public class MovieController {
 
-    private static final String API_KEY = "b3c6fea4b402c485db3ec798c57d67b5";
-
-    private static final String API_URL = "http://api.themoviedb.org/3/search/multi?api_key={key}&query={query}";
-
-    private RestTemplate template = new RestTemplate();
-
     @Resource(name = "tmdbMovieService")
     private MovieService movieService;
 

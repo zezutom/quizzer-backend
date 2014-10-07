@@ -14,6 +14,13 @@ public class Movie {
     @JsonProperty("poster_path")
     private String image;
 
+    public Movie() {}
+
+    public Movie(String title, String image) {
+        this.title = title;
+        this.image = image;
+    }
+
     public String getTitle() {
         return title;
     }
