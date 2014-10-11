@@ -1,5 +1,6 @@
 package org.zezutom.capstone.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Collection;
  */
 public class GameSet {
 
-    private long id;
+    private Long id;
 
     private Collection<Movie> movies;
 
@@ -16,4 +17,21 @@ public class GameSet {
     private Collection<Rating> ratings;
 
     private Solution solution;
+
+    public void addMovie(Movie movie) {
+        if (movies == null) movies = new ArrayList<>();
+        movies.add(movie);
+    }
+
+    public Collection<Movie> getMovies() {
+        return movies;
+    }
+
+    public Solution getSolution() {
+        return solution;
+    }
+
+    public void setSolution(Solution solution) {
+        this.solution = solution;
+    }
 }
