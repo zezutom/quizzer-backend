@@ -6,13 +6,19 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Movie;
+import org.zezutom.capstone.model.MovieImageConfig;
 import org.zezutom.capstone.model.Solution;
 
 import java.io.IOException;
@@ -28,19 +34,42 @@ public class GameApi {
 
     public static final String RESULTS_KEY = "results";
 
+    public static final String CONFIGS_KEY = "images";
+
     public static final String API_KEY = "b3c6fea4b402c485db3ec798c57d67b5";
 
-    public static final String API_URL = "http://api.themoviedb.org/3/search/multi?api_key={key}&query={query}";
+    public static final String MOVIE_QUERY = "http://api.themoviedb.org/3/search/multi?api_key={key}&query={query}";
+
+    public static final String CONFIG_QUERY = "http://api.themoviedb.org/3/configuration?api_key={key}";
+
+    public static final String CONFIG_CACHE_KEY = "config";
 
     @Autowired
     private RestTemplate template;
 
+    private Cache cache;
+
     public GameApi() {
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        try {
+            // TODO set cache expiry to 24hrs
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch(CacheException e) {
+            throw new IllegalStateException("Failed to initialize cache: " + e);
+        }
     }
 
-    public Collection<Movie> getMovie(@Named("title") String title) {
-        return getResults(title);
+    public Collection<Movie> getMoviesByTitle(@Named("title") String title) {
+        Collection<Movie> movies = retrieveData(MOVIE_QUERY, title, RESULTS_KEY, new TypeReference<List<Movie>>() {}, Collections.EMPTY_LIST);
+
+        String basePath = (String) cache.get(CONFIG_CACHE_KEY);
+        if (basePath == null) basePath = getAndCacheConfig();
+
+        for (Movie movie : movies) {
+            if (movie.getImagePath() != null) movie.setBasePath(basePath);
+        }
+        return movies;
     }
 
     public GameSetBuilder getGameSetBuilder(User user) { return new GameSetBuilder(); }
@@ -53,7 +82,7 @@ public class GameApi {
     public GameSet getRandomGameSet() {
         // TODO
         GameSet gameSet = new GameSet();
-        final Collection<Movie> movies = getResults("rainy");
+        final Collection<Movie> movies = getMoviesByTitle("rainy");
         final Iterator<Movie> iterator = movies.iterator();
         final Movie theOne = iterator.next();
 
@@ -70,23 +99,36 @@ public class GameApi {
         // TODO
     }
 
+    private String getAndCacheConfig() {
+        MovieImageConfig config = retrieveData(CONFIG_QUERY, CONFIGS_KEY, new TypeReference<MovieImageConfig>() {});
+        if (config == null) return "";
 
-    private Collection<Movie> getResults(String query) {
-        if (TextUtils.isEmpty(query)) return Collections.EMPTY_LIST;
+        final String basePath = config.getSecureBaseUrl() + config.getPosterSizes()[0];
+        cache.put(CONFIG_CACHE_KEY, basePath);
 
-        Map<String, ? extends Object> response = template.getForObject(API_URL, Map.class, API_KEY, AppUtil.sanitize(query));
+        return basePath;
+    }
 
-        if (response == null || !response.containsKey(RESULTS_KEY)) return Collections.EMPTY_LIST;
+    private <T extends Object> T retrieveData(final String queryUrl, final String key, TypeReference typeRef) {
+        return retrieveData(queryUrl, null, key, typeRef, null);
+    }
+
+    private <T extends Object> T retrieveData(final String queryUrl, final String queryString, final String key, TypeReference typeRef, T defaultValue) {
+
+        Map<String, ? extends Object> response = (queryString == null) ?
+                                                    template.getForObject(queryUrl, Map.class, API_KEY) :
+                                                    template.getForObject(queryUrl, Map.class, API_KEY, AppUtil.sanitize(queryString));
+
+        if (response == null || !response.containsKey(key)) return defaultValue;
 
         ObjectMapper mapper = new ObjectMapper();
-        List<Movie> movies = Collections.EMPTY_LIST;
+        T data;
         try {
-            final String jsonArray = mapper.writeValueAsString(response.get(RESULTS_KEY));
-            movies = mapper.readValue(jsonArray, new TypeReference<List<Movie>>() {
-            });
+            final String jsonArray = mapper.writeValueAsString(response.get(key));
+            data = mapper.readValue(jsonArray, typeRef);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("JSON parsing failed: " + e);
         }
-        return movies;
+        return data;
     }
 }

@@ -3,22 +3,26 @@ package org.zezutom.capstone.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
+
 /**
  * Created by tom on 05/10/2014.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Movie {
+public class Movie implements Serializable {
 
     private String title;
 
     @JsonProperty("poster_path")
-    private String image;
+    private String imagePath;
+
+    private String basePath;
 
     public Movie() {}
 
-    public Movie(String title, String image) {
+    public Movie(String title, String imagePath) {
         this.title = title;
-        this.image = image;
+        this.imagePath = imagePath;
     }
 
     public String getTitle() {
@@ -29,12 +33,18 @@ public class Movie {
         this.title = title;
     }
 
-    public String getImage() {
-        return image;
+    public String getImagePath() {
+        if (imagePath == null) return null;
+        else if (basePath == null) return imagePath;
+        else return basePath + imagePath;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
     }
 
     @Override
@@ -44,7 +54,7 @@ public class Movie {
 
         Movie movie = (Movie) o;
 
-        if (image != null ? !image.equals(movie.image) : movie.image != null) return false;
+        if (imagePath != null ? !imagePath.equals(movie.imagePath) : movie.imagePath != null) return false;
         if (title != null ? !title.equals(movie.title) : movie.title != null) return false;
 
         return true;
@@ -53,7 +63,7 @@ public class Movie {
     @Override
     public int hashCode() {
         int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + (imagePath != null ? imagePath.hashCode() : 0);
         return result;
     }
 }

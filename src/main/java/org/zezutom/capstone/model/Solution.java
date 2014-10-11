@@ -1,9 +1,11 @@
 package org.zezutom.capstone.model;
 
+import java.io.Serializable;
+
 /**
  * Created by tom on 05/10/2014.
  */
-public class Solution {
+public class Solution implements Serializable {
 
     private Movie movie;
 

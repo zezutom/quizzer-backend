@@ -1,7 +1,10 @@
 package org.zezutom.capstone;
 
+import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.StringStartsWith;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,20 +41,22 @@ public class GameApiTest {
 
     private MockRestServiceServer mockServer;
 
-    @Before
-    public void setUp() throws IOException {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
-        mockServer.expect(requestTo(StringStartsWith.startsWith(getQueryUrl())))
-                .andExpect(method(HttpMethod.GET))
-                .andRespond(
-                        withSuccess(getSearchResults(), MediaType.APPLICATION_JSON)
-                );
+    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalMemcacheServiceTestConfig());
 
+    @Before
+    public void setUp() {
+        helper.setUp();
+        mockServer = MockRestServiceServer.createServer(restTemplate);
+        mockQuery(GameApi.MOVIE_QUERY, "tmdbSearch");
+        mockQuery(GameApi.CONFIG_QUERY, "tmdbImageConfig");
     }
 
+    @After
+    public void tearDown() { helper.tearDown(); }
+
     @Test
-    public void getMovie() {
-        Collection<Movie> movies = gameApi.getMovie("Terminal");
+    public void getMoviesByTitle() throws IOException {
+        Collection<Movie> movies = gameApi.getMoviesByTitle("Terminal");
         assertNotNull(movies);
         assertThat(movies.size(), is(5));
 
@@ -65,7 +70,7 @@ public class GameApiTest {
     }
 
     @Test
-    public void getRandomGameSet() {
+    public void getRandomGameSet() throws IOException {
         final GameSet gameSet = gameApi.getRandomGameSet();
         assertNotNull(gameSet);
 
@@ -84,18 +89,31 @@ public class GameApiTest {
         assertNotNull(solution.getExplanation());
     }
 
-    private void assertMovie(Movie movie, String title, String image) {
+    private void mockQuery(String queryUrl, String fileName) {
+        try {
+            mockServer.expect(requestTo(StringStartsWith.startsWith(getQueryUrl(queryUrl))))
+                    .andExpect(method(HttpMethod.GET))
+                    .andRespond(
+                            withSuccess(readJsonFile(fileName), MediaType.APPLICATION_JSON)
+                    );
+        }
+        catch (IOException e) {
+            fail("Couldn't create a mocked response for: " + queryUrl);
+        }
+    }
+
+    private void assertMovie(Movie movie, String title, String imagePath) {
         assertNotNull(movie);
         assertThat(movie.getTitle(), is(title));
-        assertThat(movie.getImage(), is(image));
+        assertThat(movie.getImagePath(), is("https://image.tmdb.org/t/p/w92" + imagePath));
     }
 
-    private String getSearchResults() throws IOException {
-        return IOUtils.toString(new ClassPathResource("tmdbSearch.json").getInputStream());
+    private String readJsonFile(String fileName) throws IOException {
+        return IOUtils.toString(new ClassPathResource(fileName + ".json").getInputStream());
     }
 
-    private String getQueryUrl() {
-        return GameApi.API_URL.replace("{key}", GameApi.API_KEY).replace("{query}", "");
+    private String getQueryUrl(String baseUrl) {
+        return baseUrl.replace("{key}", GameApi.API_KEY).replace("{query}", "");
     }
 
 }
