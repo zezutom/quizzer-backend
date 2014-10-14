@@ -2,6 +2,7 @@ package org.zezutom.capstone.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.zezutom.capstone.AppUtil;
 
 import java.io.Serializable;
 
@@ -12,6 +13,14 @@ import java.io.Serializable;
 public class Movie implements Serializable {
 
     private String title;
+
+    private String genre;
+
+    @JsonProperty("vote_average")
+    private Float rating;
+
+    @JsonProperty("release_date")
+    private Integer year;
 
     @JsonProperty("poster_path")
     private String imagePath;
@@ -45,6 +54,30 @@ public class Movie implements Serializable {
 
     public void setBasePath(String basePath) {
         this.basePath = basePath;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = AppUtil.parseRating(rating);
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(String date) {
+        this.year = AppUtil.parseYear(date);
     }
 
     @Override

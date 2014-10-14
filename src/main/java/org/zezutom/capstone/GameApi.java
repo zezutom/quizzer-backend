@@ -10,10 +10,8 @@ import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
 import net.sf.jsr107cache.CacheManager;
-import org.apache.http.util.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.zezutom.capstone.model.GameSet;
@@ -38,9 +36,9 @@ public class GameApi {
 
     public static final String API_KEY = "b3c6fea4b402c485db3ec798c57d67b5";
 
-    public static final String MOVIE_QUERY = "http://api.themoviedb.org/3/search/multi?api_key={key}&query={query}";
+    public static final String MOVIE_QUERY = "https://api.themoviedb.org/3/search/movie?api_key={key}&query={query}";
 
-    public static final String CONFIG_QUERY = "http://api.themoviedb.org/3/configuration?api_key={key}";
+    public static final String CONFIG_QUERY = "https://api.themoviedb.org/3/configuration?api_key={key}";
 
     public static final String CONFIG_CACHE_KEY = "config";
 
@@ -82,7 +80,7 @@ public class GameApi {
     public GameSet getRandomGameSet() {
         // TODO
         GameSet gameSet = new GameSet();
-        final Collection<Movie> movies = getMoviesByTitle("rainy");
+        final Collection<Movie> movies = getMoviesByTitle("Terminal");
         final Iterator<Movie> iterator = movies.iterator();
         final Movie theOne = iterator.next();
 
@@ -103,7 +101,11 @@ public class GameApi {
         MovieImageConfig config = retrieveData(CONFIG_QUERY, CONFIGS_KEY, new TypeReference<MovieImageConfig>() {});
         if (config == null) return "";
 
-        final String basePath = config.getSecureBaseUrl() + config.getPosterSizes()[0];
+        String basePath = config.getSecureBaseUrl();
+
+        final String[] posters = config.getPosterSizes();
+        if (posters != null && posters.length > 0)  basePath += posters[0];
+
         cache.put(CONFIG_CACHE_KEY, basePath);
 
         return basePath;

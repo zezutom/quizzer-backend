@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Movie;
 import org.zezutom.capstone.model.Solution;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -62,11 +63,11 @@ public class GameApiTest {
 
         final Iterator<Movie> iterator = movies.iterator();
 
-        assertMovie(iterator.next(), "The Terminal", "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg");
-        assertMovie(iterator.next(), "The Terminal Man", "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg");
-        assertMovie(iterator.next(), "The Smashing Pumpkins: Terminal 5", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg");
-        assertMovie(iterator.next(), "Prison Terminal: The Last Days of Private Jack Hall", "/knCEuyiUJvEgbn1POhoVe0ivI5E.jpg");
-        assertMovie(iterator.next(), "The Terminal Trust", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg");
+        assertMovie(iterator.next(), "The Terminal", "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg", 2004, AppUtil.parseRating("6.8"));
+        assertMovie(iterator.next(), "The Terminal Man", "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg", 1974, AppUtil.parseRating("0.0"));
+        assertMovie(iterator.next(), "The Smashing Pumpkins: Terminal 5", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg", 2011, AppUtil.parseRating("9.5"));
+        assertMovie(iterator.next(), "Prison Terminal: The Last Days of Private Jack Hall", "/knCEuyiUJvEgbn1POhoVe0ivI5E.jpg", 2013, AppUtil.parseRating("0.0"));
+        assertMovie(iterator.next(), "The Terminal Trust", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg", 2012, AppUtil.parseRating("3.0"));
     }
 
     @Test
@@ -102,10 +103,12 @@ public class GameApiTest {
         }
     }
 
-    private void assertMovie(Movie movie, String title, String imagePath) {
+    private void assertMovie(Movie movie, String title, String imagePath, Integer year, Float rating) {
         assertNotNull(movie);
         assertThat(movie.getTitle(), is(title));
         assertThat(movie.getImagePath(), is("https://image.tmdb.org/t/p/w92" + imagePath));
+        assertThat(movie.getYear(), is(year));
+        assertThat(movie.getRating(), is(rating));
     }
 
     private String readJsonFile(String fileName) throws IOException {
