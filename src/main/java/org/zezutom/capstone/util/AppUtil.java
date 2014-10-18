@@ -1,13 +1,19 @@
-package org.zezutom.capstone;
+package org.zezutom.capstone.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 /**
  * Created by tom on 05/10/2014.
  */
 public class AppUtil {
+
+    public static final String API_VERSION = "v1";
 
     public static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
@@ -23,6 +29,8 @@ public class AppUtil {
 
     public static final String HTTP_POST = "post";
 
+    private static final Random RANDOM = new Random();
+
     private AppUtil() {}
 
     public static String sanitize(String input) {
@@ -35,10 +43,14 @@ public class AppUtil {
         else return Integer.valueOf(date.trim().split("-")[0]);
     }
 
-    public static Float parseRating(String rating) {
+    public static Double parseRating(String rating) {
         rating = sanitize(rating);
         if (!validate(rating, RATING_REGEX)) return null;
-        else return Float.parseFloat(rating);
+        else return Double.parseDouble(rating);
+    }
+
+    public static long randomLong(Long range) {
+        return (long)(RANDOM.nextDouble() * range) + 1;
     }
 
     private static boolean validate(String value, String regex) {

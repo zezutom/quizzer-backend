@@ -16,13 +16,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Movie;
-import org.zezutom.capstone.model.Solution;
+import org.zezutom.capstone.service.TmdbMovieApi;
+import org.zezutom.capstone.util.AppUtil;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -32,10 +32,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring-servlet.xml")
-public class GameApiTest {
+public class TmdbMovieApiTest {
 
     @Autowired
-    private GameApi gameApi;
+    private TmdbMovieApi movieApi;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -48,16 +48,17 @@ public class GameApiTest {
     public void setUp() {
         helper.setUp();
         mockServer = MockRestServiceServer.createServer(restTemplate);
-        mockQuery(GameApi.MOVIE_QUERY, "tmdbSearch");
-        mockQuery(GameApi.CONFIG_QUERY, "tmdbImageConfig");
+        mockQuery(TmdbMovieApi.MOVIE_QUERY, "tmdbSearch");
+        mockQuery(TmdbMovieApi.CONFIG_QUERY, "tmdbImageConfig");
     }
 
     @After
     public void tearDown() { helper.tearDown(); }
 
+
     @Test
-    public void getMoviesByTitle() throws IOException {
-        Collection<Movie> movies = gameApi.getMoviesByTitle("Terminal");
+    public void findByTitle() {
+        List<Movie> movies = movieApi.findByTitle("Terminal");
         assertNotNull(movies);
         assertThat(movies.size(), is(5));
 
@@ -68,26 +69,23 @@ public class GameApiTest {
         assertMovie(iterator.next(), "The Smashing Pumpkins: Terminal 5", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg", 2011, AppUtil.parseRating("9.5"));
         assertMovie(iterator.next(), "Prison Terminal: The Last Days of Private Jack Hall", "/knCEuyiUJvEgbn1POhoVe0ivI5E.jpg", 2013, AppUtil.parseRating("0.0"));
         assertMovie(iterator.next(), "The Terminal Trust", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg", 2012, AppUtil.parseRating("3.0"));
+
     }
 
-    @Test
-    public void getRandomGameSet() throws IOException {
-        final GameSet gameSet = gameApi.getRandomGameSet();
-        assertNotNull(gameSet);
+    private void assertMovie(Movie movie, String title, String imagePath, Integer year, Double rating) {
+        assertNotNull(movie);
+        assertThat(movie.getTitle(), is(title));
+        assertThat(movie.getImageUrl(), is("https://image.tmdb.org/t/p/w92" + imagePath));
+        assertThat(movie.getYear(), is(year));
+        assertThat(movie.getRating(), is(rating));
+    }
 
-        // A game set should comprise exactly four movies
-        final Collection<Movie> movies = gameSet.getMovies();
-        assertNotNull(movies);
-        assertThat(movies.size(), is(4));
+    private String readJsonFile(String fileName) throws IOException {
+        return IOUtils.toString(new ClassPathResource(fileName + ".json").getInputStream());
+    }
 
-        // There should be a solution to the game set
-        final Solution solution = gameSet.getSolution();
-        assertNotNull(solution);
-
-        // The solution should refer to one of the 4 movies
-        // and it should provide an explanation
-        assertTrue(movies.contains(solution.getMovie()));
-        assertNotNull(solution.getExplanation());
+    private String getQueryUrl(String baseUrl) {
+        return baseUrl.replace("{key}", TmdbMovieApi.API_KEY).replace("{query}", "");
     }
 
     private void mockQuery(String queryUrl, String fileName) {
@@ -102,21 +100,4 @@ public class GameApiTest {
             fail("Couldn't create a mocked response for: " + queryUrl);
         }
     }
-
-    private void assertMovie(Movie movie, String title, String imagePath, Integer year, Float rating) {
-        assertNotNull(movie);
-        assertThat(movie.getTitle(), is(title));
-        assertThat(movie.getImagePath(), is("https://image.tmdb.org/t/p/w92" + imagePath));
-        assertThat(movie.getYear(), is(year));
-        assertThat(movie.getRating(), is(rating));
-    }
-
-    private String readJsonFile(String fileName) throws IOException {
-        return IOUtils.toString(new ClassPathResource(fileName + ".json").getInputStream());
-    }
-
-    private String getQueryUrl(String baseUrl) {
-        return baseUrl.replace("{key}", GameApi.API_KEY).replace("{query}", "");
-    }
-
 }

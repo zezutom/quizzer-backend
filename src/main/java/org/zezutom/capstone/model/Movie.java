@@ -2,36 +2,64 @@ package org.zezutom.capstone.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.zezutom.capstone.AppUtil;
+import org.datanucleus.api.jpa.annotations.Extension;
+import org.zezutom.capstone.util.AppUtil;
 
-import java.io.Serializable;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created by tom on 05/10/2014.
- */
+@Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Movie implements Serializable {
+public class Movie {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
+    private String id;
+
+    @Version
+    private Long version;
 
     private String title;
 
     private String genre;
 
     @JsonProperty("vote_average")
-    private Float rating;
+    private Double rating;
 
     @JsonProperty("release_date")
     private Integer year;
 
     @JsonProperty("poster_path")
-    private String imagePath;
+    private String imageUrl;
 
     private String basePath;
 
+    @ManyToMany
+    private List<GameSet> gameSets;
+
     public Movie() {}
 
-    public Movie(String title, String imagePath) {
+    public Movie(String title, String imageUrl) {
         this.title = title;
-        this.imagePath = imagePath;
+        this.imageUrl = imageUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public String getTitle() {
@@ -42,14 +70,14 @@ public class Movie implements Serializable {
         this.title = title;
     }
 
-    public String getImagePath() {
-        if (imagePath == null) return null;
-        else if (basePath == null) return imagePath;
-        else return basePath + imagePath;
+    public String getImageUrl() {
+        if (imageUrl == null) return null;
+        else if (basePath == null) return imageUrl;
+        else return basePath + imageUrl;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setBasePath(String basePath) {
@@ -64,7 +92,7 @@ public class Movie implements Serializable {
         this.genre = genre;
     }
 
-    public Float getRating() {
+    public Double getRating() {
         return rating;
     }
 
@@ -80,6 +108,15 @@ public class Movie implements Serializable {
         this.year = AppUtil.parseYear(date);
     }
 
+    public void addGameSet(GameSet gameSet) {
+        if (gameSets == null) gameSets = new ArrayList<>();
+        gameSets.add(gameSet);
+    }
+
+    public List<GameSet> getGameSets() {
+        return gameSets;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,7 +124,7 @@ public class Movie implements Serializable {
 
         Movie movie = (Movie) o;
 
-        if (imagePath != null ? !imagePath.equals(movie.imagePath) : movie.imagePath != null) return false;
+        if (imageUrl != null ? !imageUrl.equals(movie.imageUrl) : movie.imageUrl != null) return false;
         if (title != null ? !title.equals(movie.title) : movie.title != null) return false;
 
         return true;
@@ -96,7 +133,7 @@ public class Movie implements Serializable {
     @Override
     public int hashCode() {
         int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (imagePath != null ? imagePath.hashCode() : 0);
+        result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
         return result;
     }
 }

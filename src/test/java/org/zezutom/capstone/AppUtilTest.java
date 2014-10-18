@@ -1,6 +1,8 @@
 package org.zezutom.capstone;
 
 import org.junit.Test;
+import org.zezutom.capstone.util.AppUtil;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 /**
@@ -18,11 +20,18 @@ public class AppUtilTest {
 
     @Test
     public void parseRating() {
-        assertThat(AppUtil.parseRating("6.2"), is(6.2f));
-        assertThat(AppUtil.parseRating("10.12345"), is(10.12345f));
-        assertThat(AppUtil.parseRating(".123"), is(0.123f));
-        assertThat(AppUtil.parseRating("12345"), is(12345f));
+        assertThat(AppUtil.parseRating("6.2"), is(6.2d));
+        assertThat(AppUtil.parseRating("10.12345"), is(10.12345d));
+        assertThat(AppUtil.parseRating(".123"), is(0.123d));
+        assertThat(AppUtil.parseRating("12345"), is(12345d));
         assertNull(AppUtil.parseRating("-4.3"));
+    }
+
+    @Test
+    public void randomLong() {
+        final long range = 100L;
+        final long value = AppUtil.randomLong(range);
+        assertTrue(value > 0 && value <= range);
     }
 
 }

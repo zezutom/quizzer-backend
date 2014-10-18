@@ -1,11 +1,8 @@
-package org.zezutom.capstone;
+package org.zezutom.capstone.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.ApiMethod;
-import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.users.User;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
@@ -14,21 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Movie;
 import org.zezutom.capstone.model.MovieImageConfig;
-import org.zezutom.capstone.model.Solution;
+import org.zezutom.capstone.util.AppUtil;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
-@Api(name = "game",
-        version = "v1",
+@Api(name = "movie",
+        version = AppUtil.API_VERSION,
         scopes = {AppUtil.EMAIL_SCOPE},
         clientIds = {AppUtil.ANDROID_CLIENT_ID},
         audiences = {AppUtil.ANDROID_AUDIENCE})
-public class GameApi {
+public class TmdbMovieApi implements MovieApi {
 
     public static final String RESULTS_KEY = "results";
 
@@ -47,7 +45,7 @@ public class GameApi {
 
     private Cache cache;
 
-    public GameApi() {
+    public TmdbMovieApi() {
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         try {
             // TODO set cache expiry to 24hrs
@@ -58,43 +56,17 @@ public class GameApi {
         }
     }
 
-    public Collection<Movie> getMoviesByTitle(@Named("title") String title) {
-        Collection<Movie> movies = retrieveData(MOVIE_QUERY, title, RESULTS_KEY, new TypeReference<List<Movie>>() {}, Collections.EMPTY_LIST);
+    @Override
+    public List<Movie> findByTitle(String title) {
+        List<Movie> movies = retrieveData(MOVIE_QUERY, title, RESULTS_KEY, new TypeReference<List<Movie>>() {}, Collections.EMPTY_LIST);
 
         String basePath = (String) cache.get(CONFIG_CACHE_KEY);
         if (basePath == null) basePath = getAndCacheConfig();
 
         for (Movie movie : movies) {
-            if (movie.getImagePath() != null) movie.setBasePath(basePath);
+            if (movie.getImageUrl() != null) movie.setBasePath(basePath);
         }
         return movies;
-    }
-
-    public GameSetBuilder getGameSetBuilder(User user) { return new GameSetBuilder(); }
-
-    public GameSet getGameSet(@Named("id") Long id) {
-        // TODO
-        return null;
-    }
-
-    public GameSet getRandomGameSet() {
-        // TODO
-        GameSet gameSet = new GameSet();
-        final Collection<Movie> movies = getMoviesByTitle("Terminal");
-        final Iterator<Movie> iterator = movies.iterator();
-        final Movie theOne = iterator.next();
-
-        gameSet.addMovie(iterator.next());
-        gameSet.addMovie(iterator.next());
-        gameSet.addMovie(iterator.next());
-        gameSet.addMovie(theOne);
-        gameSet.setSolution(new Solution(theOne, "Lucky day is the secret."));
-        return gameSet;
-    }
-
-    @ApiMethod(name = "game.addGameSet", httpMethod = AppUtil.HTTP_POST)
-    public void addGameSet(User user, GameSet gameSet) {
-        // TODO
     }
 
     private String getAndCacheConfig() {
@@ -118,8 +90,8 @@ public class GameApi {
     private <T extends Object> T retrieveData(final String queryUrl, final String queryString, final String key, TypeReference typeRef, T defaultValue) {
 
         Map<String, ? extends Object> response = (queryString == null) ?
-                                                    template.getForObject(queryUrl, Map.class, API_KEY) :
-                                                    template.getForObject(queryUrl, Map.class, API_KEY, AppUtil.sanitize(queryString));
+                template.getForObject(queryUrl, Map.class, API_KEY) :
+                template.getForObject(queryUrl, Map.class, API_KEY, AppUtil.sanitize(queryString));
 
         if (response == null || !response.containsKey(key)) return defaultValue;
 
