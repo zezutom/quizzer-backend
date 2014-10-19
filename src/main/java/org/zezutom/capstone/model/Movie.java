@@ -108,7 +108,7 @@ public class Movie {
     }
 
     @JsonProperty("release_date")
-    public void setYear(String date) {
+    public void setReleaseYear(String date) {
         this.year = AppUtil.parseYear(date);
     }
 

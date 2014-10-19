@@ -53,7 +53,7 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void play() {
+    public void getNextGameSet() {
 
         final GameSet gameSet = gameApi.getNextGameSet();
         assertNotNull(gameSet);
@@ -125,10 +125,10 @@ public class TmdbGameApiTest {
     public void addGameSet() {
 
         final GameSet gameSet = new GameSetBuilder()
-                .addMovie(createMovie("The Wolf of Wall Street", "7.5", "2013", "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"))
-                .addMovie(createMovie("The Hunger Games", "6.9", "2012", "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"))
-                .addMovie(createMovie("The Hobbit", "4.3", "2012", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"))
-                .addMovie(createMovie("Gravity", "8.2", "2013", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"))
+                .addMovie(createMovie("The Wolf of Wall Street", "7.5", 2013, "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"))
+                .addMovie(createMovie("The Hunger Games", "6.9", 2012, "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"))
+                .addMovie(createMovie("The Hobbit", "4.3", 2012, "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"))
+                .addMovie(createMovie("Gravity", "8.2", 2013, "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"))
                 .setAnswer(3)
                 .setExplanation("The is no Hobbit anywhere but in this one.")
                 .build();
@@ -140,10 +140,10 @@ public class TmdbGameApiTest {
         GameSet gameSet = new GameSet();
 
         // Add movies
-        gameSet.addMovie(createMovie("The Terminal", "6.8", "2004", "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"));
-        gameSet.addMovie(createMovie("The Terminal Man", "0.0", "1974", "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"));
-        gameSet.addMovie(createMovie("The Smashing Pumpkins: Terminal 5", "9.5", "2011", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"));
-        gameSet.addMovie(createMovie("The Terminal Trust", "3.0", "2012", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"));
+        gameSet.addMovie(createMovie("The Terminal", "6.8", 2004, "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"));
+        gameSet.addMovie(createMovie("The Terminal Man", "0.0", 1974, "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"));
+        gameSet.addMovie(createMovie("The Smashing Pumpkins: Terminal 5", "9.5", 2011, "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"));
+        gameSet.addMovie(createMovie("The Terminal Trust", "3.0", 2012, "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"));
 
         // Select the answer
         gameSet.setAnswer(1);
@@ -158,7 +158,7 @@ public class TmdbGameApiTest {
         return new User("test", "test@test.com");
     }
 
-    private Movie createMovie(String title, String rating, String year, String imageUrl) {
+    private Movie createMovie(String title, String rating, Integer year, String imageUrl) {
         Movie movie = new Movie();
         movie.setTitle(title);
         movie.setRating(rating);
