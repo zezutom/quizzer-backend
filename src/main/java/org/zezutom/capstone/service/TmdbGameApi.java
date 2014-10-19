@@ -35,7 +35,7 @@ public class TmdbGameApi implements GameApi {
     }
 
     @Override
-    public GameSet play() {
+    public GameSet getNextGameSet() {
         final List<GameSet> gameSets = gameSetRepository.findAll();
         if (gameSets == null || gameSets.isEmpty()) return null;
         return gameSets.get(AppUtil.randomInt(gameSets.size()));

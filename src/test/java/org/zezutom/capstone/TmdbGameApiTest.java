@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 import org.zezutom.capstone.dao.GameSetRepository;
 import org.zezutom.capstone.dao.ScoreRepository;
 import org.zezutom.capstone.model.GameSet;
@@ -56,7 +55,7 @@ public class TmdbGameApiTest {
     @Test
     public void play() {
 
-        final GameSet gameSet = gameApi.play();
+        final GameSet gameSet = gameApi.getNextGameSet();
         assertNotNull(gameSet);
 
         // A game set should comprise exactly four movies
@@ -78,7 +77,7 @@ public class TmdbGameApiTest {
     @Test
     public void rate() {
         // Retrieve a game set
-        GameSet gameSet = gameApi.play();
+        GameSet gameSet = gameApi.getNextGameSet();
         assertNotNull(gameSet);
 
         // rate it

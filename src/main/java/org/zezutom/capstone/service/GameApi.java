@@ -8,7 +8,7 @@ import org.zezutom.capstone.model.GameSet;
  */
 public interface GameApi {
 
-    GameSet play();
+    GameSet getNextGameSet();
 
     void rate(User user, Long gameSetId, Double rating);
 

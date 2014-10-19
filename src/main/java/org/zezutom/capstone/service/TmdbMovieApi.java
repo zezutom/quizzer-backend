@@ -3,6 +3,7 @@ package org.zezutom.capstone.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
@@ -57,6 +58,7 @@ public class TmdbMovieApi implements MovieApi {
         }
     }
 
+    @ApiMethod(httpMethod = ApiMethod.HttpMethod.GET)
     @Override
     public List<Movie> findByTitle(@Named("title") String title) {
         List<Movie> movies = retrieveData(MOVIE_QUERY, title, RESULTS_KEY, new TypeReference<List<Movie>>() {}, Collections.EMPTY_LIST);
