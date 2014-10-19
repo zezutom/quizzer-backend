@@ -28,7 +28,6 @@ public class Movie {
     @JsonProperty("vote_average")
     private Double rating;
 
-    @JsonProperty("release_date")
     private Integer year;
 
     @JsonProperty("poster_path")
@@ -104,6 +103,11 @@ public class Movie {
         return year;
     }
 
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    @JsonProperty("release_date")
     public void setYear(String date) {
         this.year = AppUtil.parseYear(date);
     }
