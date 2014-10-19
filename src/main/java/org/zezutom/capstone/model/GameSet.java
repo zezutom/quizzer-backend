@@ -1,7 +1,5 @@
 package org.zezutom.capstone.model;
 
-import org.zezutom.capstone.util.AppUtil;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +14,8 @@ public class GameSet {
     @Version
     private Long version;
 
+    private String author;
+
     private String explanation;
 
     private Integer answer;
@@ -29,6 +29,10 @@ public class GameSet {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getVersion() {
@@ -71,5 +75,39 @@ public class GameSet {
 
     public void setAnswer(Integer answer) {
         this.answer = answer;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GameSet)) return false;
+
+        GameSet gameSet = (GameSet) o;
+
+        if (answer != null ? !answer.equals(gameSet.answer) : gameSet.answer != null) return false;
+        if (author != null ? !author.equals(gameSet.author) : gameSet.author != null) return false;
+        if (explanation != null ? !explanation.equals(gameSet.explanation) : gameSet.explanation != null) return false;
+        if (id != null ? !id.equals(gameSet.id) : gameSet.id != null) return false;
+        if (version != null ? !version.equals(gameSet.version) : gameSet.version != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
+        result = 31 * result + (explanation != null ? explanation.hashCode() : 0);
+        result = 31 * result + (answer != null ? answer.hashCode() : 0);
+        return result;
     }
 }

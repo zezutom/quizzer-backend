@@ -14,4 +14,6 @@ public interface GameApi {
 
     void score(User user, Integer points);
 
+    GameSet addGameSet(User user, GameSet gameSet);
+
 }

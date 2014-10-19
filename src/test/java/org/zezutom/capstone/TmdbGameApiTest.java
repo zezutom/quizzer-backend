@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import org.zezutom.capstone.dao.GameSetRepository;
 import org.zezutom.capstone.dao.ScoreRepository;
 import org.zezutom.capstone.model.GameSet;
@@ -17,6 +18,7 @@ import org.zezutom.capstone.model.Movie;
 import org.zezutom.capstone.model.Rating;
 import org.zezutom.capstone.model.Score;
 import org.zezutom.capstone.service.GameApi;
+import org.zezutom.capstone.util.GameSetBuilder;
 
 import java.util.List;
 
@@ -118,6 +120,21 @@ public class TmdbGameApiTest {
 
         // and that it is associated with the user
         assertThat(score.getUsername(), is(user.getUserId()));
+    }
+
+    @Test
+    public void addGameSet() {
+
+        final GameSet gameSet = new GameSetBuilder()
+                .addMovie(createMovie("The Wolf of Wall Street", "7.5", "2013", "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"))
+                .addMovie(createMovie("The Hunger Games", "6.9", "2012", "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"))
+                .addMovie(createMovie("The Hobbit", "4.3", "2012", "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"))
+                .addMovie(createMovie("Gravity", "8.2", "2013", "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"))
+                .setAnswer(3)
+                .setExplanation("The is no Hobbit anywhere but in this one.")
+                .build();
+
+        assertThat(gameApi.addGameSet(createUser(), gameSet), is(gameSet));
     }
 
     private GameSet createGameSet() {

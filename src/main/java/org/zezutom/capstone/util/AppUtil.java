@@ -1,11 +1,10 @@
 package org.zezutom.capstone.util;
 
+import com.google.appengine.api.users.User;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.springframework.http.MediaType;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -49,12 +48,17 @@ public class AppUtil {
         else return Double.parseDouble(rating);
     }
 
-    public static long randomLong(Long range) {
-        return (long)(RANDOM.nextDouble() * range) + 1;
+    public static int randomInt(int range) {
+        return RANDOM.nextInt(range);
+    }
+
+    public static String getUsername(User user) {
+        return user == null ? null : user.getUserId();
     }
 
     private static boolean validate(String value, String regex) {
         return value != null && value.matches(regex);
     }
+
 
 }

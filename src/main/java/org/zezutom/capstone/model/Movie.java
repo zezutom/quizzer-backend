@@ -113,10 +113,6 @@ public class Movie {
         gameSets.add(gameSet);
     }
 
-    public List<GameSet> getGameSets() {
-        return gameSets;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

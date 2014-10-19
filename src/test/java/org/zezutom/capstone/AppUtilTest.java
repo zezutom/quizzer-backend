@@ -1,13 +1,12 @@
 package org.zezutom.capstone;
 
+import com.google.appengine.api.users.User;
 import org.junit.Test;
 import org.zezutom.capstone.util.AppUtil;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
-/**
- * Created by tom on 14/10/2014.
- */
+
 public class AppUtilTest {
 
     @Test
@@ -29,9 +28,20 @@ public class AppUtilTest {
 
     @Test
     public void randomLong() {
-        final long range = 100L;
-        final long value = AppUtil.randomLong(range);
-        assertTrue(value > 0 && value <= range);
+        final int range = 100;
+        final int value = AppUtil.randomInt(range);
+        assertTrue(value >= 0 && value < range);
     }
 
+    @Test
+    public void getUsername() {
+        assertNull(AppUtil.getUsername(null));
+        assertThat(AppUtil.getUsername(createUser("user A")), is("user A"));
+        assertThat(AppUtil.getUsername(createUser("user B")), is("user B"));
+        assertThat(AppUtil.getUsername(createUser("user C")), is("user C"));
+    }
+
+    private User createUser(String username) {
+        return new User("test@test.com", "", username);
+    }
 }

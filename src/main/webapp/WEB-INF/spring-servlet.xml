@@ -19,14 +19,6 @@
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <!-- TODO: read values from props (test vs runtime) -->
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-        <property name="url" value="jdbc:hsqldb:mem:paging" />
-        <property name="username" value="sa" />
-        <property name="password" value="" />
-    </bean>
-
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
