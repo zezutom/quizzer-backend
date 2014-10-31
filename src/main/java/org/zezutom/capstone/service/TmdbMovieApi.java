@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
@@ -16,18 +17,22 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.zezutom.capstone.model.Movie;
 import org.zezutom.capstone.model.MovieImageConfig;
 import org.zezutom.capstone.util.AppUtil;
+import org.zezutom.capstone.util.Ids;
+import org.zezutom.capstone.util.Scopes;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
+
 @Service
-@Api(name = "movie",
+@Api(name = "movie", namespace = @ApiNamespace(ownerDomain = "org.zezutom", ownerName = "org.zezutom"),
         version = AppUtil.API_VERSION,
-        scopes = {AppUtil.EMAIL_SCOPE},
-        clientIds = {AppUtil.ANDROID_CLIENT_ID},
-        audiences = {AppUtil.ANDROID_AUDIENCE})
+        clientIds = {Ids.WEB, Ids.ANDROID, API_EXPLORER_CLIENT_ID},
+        audiences = {Ids.WEB, Ids.ANDROID},
+        scopes = {Scopes.EMAIL, Scopes.PROFILE})
 public class TmdbMovieApi implements MovieApi {
 
     public static final String RESULTS_KEY = "results";

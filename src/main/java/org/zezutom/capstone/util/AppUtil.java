@@ -3,7 +3,6 @@ package org.zezutom.capstone.util;
 import com.google.appengine.api.users.User;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
-import org.springframework.http.MediaType;
 
 import java.util.Random;
 
@@ -17,16 +16,6 @@ public class AppUtil {
     public static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
     public static final String RATING_REGEX = "^\\d*\\.?\\d+$";
-
-    public static final MediaType APPLICATION_JSON_UTF8 = MediaType.parseMediaType("application/json;charset=UTF-8");
-
-    public static final String EMAIL_SCOPE = "https://www.googleapis.com/auth/userinfo.email";
-
-    public static final String ANDROID_CLIENT_ID = "98684777677-b01sr36gsj0ej7pvvsndopepa01mg6du.apps.googleusercontent.com";
-
-    public static final String ANDROID_AUDIENCE = ANDROID_CLIENT_ID;
-
-    public static final String HTTP_POST = "post";
 
     private static final Random RANDOM = new Random();
 

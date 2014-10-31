@@ -1,6 +1,7 @@
 package org.zezutom.capstone.service;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,19 @@ import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Rating;
 import org.zezutom.capstone.model.Score;
 import org.zezutom.capstone.util.AppUtil;
+import org.zezutom.capstone.util.Ids;
+import org.zezutom.capstone.util.Scopes;
 
 import java.util.List;
 
+import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
+
 @Service
-@Api(name = "game",
+@Api(name = "game", namespace = @ApiNamespace(ownerDomain = "org.zezutom", ownerName = "org.zezutom"),
         version = AppUtil.API_VERSION,
-        scopes = {AppUtil.EMAIL_SCOPE},
-        clientIds = {AppUtil.ANDROID_CLIENT_ID},
-        audiences = {AppUtil.ANDROID_AUDIENCE})
+        clientIds = {Ids.WEB, Ids.ANDROID, API_EXPLORER_CLIENT_ID},
+        audiences = {Ids.WEB, Ids.ANDROID},
+        scopes = {Scopes.EMAIL, Scopes.PROFILE})
 public class TmdbGameApi implements GameApi {
 
     @Autowired
@@ -61,5 +66,13 @@ public class TmdbGameApi implements GameApi {
     public void score(User user, @Named("points") Integer points) {
         Score score = new Score(points, user.getUserId());
         scoreRepository.save(score);
+    }
+
+    // TODO deleteme
+    public Score getFakeScore(User user) {
+        if (user == null)
+            return new Score(0, "anonymous");
+        else
+            return new Score(100, user.getEmail());
     }
 }
