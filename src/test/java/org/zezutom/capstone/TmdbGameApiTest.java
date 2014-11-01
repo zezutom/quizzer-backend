@@ -16,6 +16,9 @@ import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.service.GameApi;
 import org.zezutom.capstone.util.GameSetBuilder;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -26,6 +29,10 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = "classpath:spring-servlet.xml")
 public class TmdbGameApiTest {
 
+    public static final int INSTANCE_COUNT = 3;
+
+    public static final int TOTAL_COUNT = INSTANCE_COUNT * Difficulty.values().length;
+
     @Autowired
     private GameApi gameApi;
 
@@ -35,12 +42,29 @@ public class TmdbGameApiTest {
     @Autowired
     private ScoreRepository scoreRepository;
 
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
     private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
             new LocalDatastoreServiceTestConfig().setApplyAllHighRepJobPolicy());
 
     @Before
     public void setUp() {
         helper.setUp();
+
+        // To overcame the GAE's limitation of max 5 entity instances per transaction
+        // I have no choice but to resort to nested transactions
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        // I want a full range of difficulties, 3 game sets of each type
+        for (int i = 0; i < INSTANCE_COUNT; i++) {
+            transaction.begin();
+            for (Difficulty difficulty : Difficulty.values())
+                gameSetRepository.save(createGameSet(difficulty));
+            transaction.commit();
+        }
     }
 
     @After
@@ -51,17 +75,11 @@ public class TmdbGameApiTest {
     @Test
     public void randomizeByDifficulty() {
 
-        // Prepare data
-        gameSetRepository.save(createGameSet(Difficulty.EASY));
-        gameSetRepository.save(createGameSet(Difficulty.EASY));
-        gameSetRepository.save(createGameSet(Difficulty.EASY));
-        gameSetRepository.save(createGameSet(Difficulty.TOUGH));
-
         // Set expectations
         final int twoEasyOnes = 2;
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomGameSetsByDifficulty(twoEasyOnes, Difficulty.EASY);
+        final List<GameSet> gameSets = gameApi.getRandomByDifficulty(twoEasyOnes, Difficulty.EASY);
         assertNotNull(gameSets);
 
         // The total number of returned records should (in this case) fit the requested count
@@ -72,14 +90,24 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void randomizeByCriteria() {
+    public void randomizeByDifficultyTooFewRecords() {
 
-        // Prepare data
-        gameSetRepository.save(createGameSet(Difficulty.EASY));
-        gameSetRepository.save(createGameSet(Difficulty.AVERAGE));
-        gameSetRepository.save(createGameSet(Difficulty.CHALLENGING));
-        gameSetRepository.save(createGameSet(Difficulty.CHALLENGING));
-        gameSetRepository.save(createGameSet(Difficulty.TOUGH));
+        // Set expectations - there is not enough data for this
+        final int tooManyEasyOnes = whateverIsTooMany();
+
+        // Fetch results
+        final List<GameSet> gameSets = gameApi.getRandomByDifficulty(tooManyEasyOnes, Difficulty.EASY);
+        assertNotNull(gameSets);
+
+        // The total number of returned records should be the same as the number of total records available
+        assertTrue(gameSets.size() == INSTANCE_COUNT);
+
+        // Verify individual game sets
+        for (GameSet gameSet : gameSets) assertGameSet(gameSet, Difficulty.EASY);
+    }
+
+    @Test
+    public void randomizeByCriteria() {
 
         // Set expectations
         final int anAverageOne = 1;
@@ -92,7 +120,7 @@ public class TmdbGameApiTest {
         criteria.put(Difficulty.TOUGH, aToughOne);
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomGameSetsByCriteria(criteria);
+        final List<GameSet> gameSets = gameApi.getRandomByCriteria(criteria);
         assertNotNull(gameSets);
 
         // The total number of returned records should (in this case) fit the sum of all requested counts
@@ -112,6 +140,45 @@ public class TmdbGameApiTest {
         assertTrue(difficultyMap.get(Difficulty.AVERAGE) == anAverageOne);
         assertTrue(difficultyMap.get(Difficulty.CHALLENGING) == twoChallenges);
         assertTrue(difficultyMap.get(Difficulty.TOUGH) == aToughOne);
+    }
+
+    @Test
+    public void randomizeByCriteriaTooFewRecords() {
+
+        // Set expectations - note that there isn't enough data
+        final int tooManyEasyOnes =     whateverIsTooMany();
+        final int tooManyAverageOnes =  whateverIsTooMany();
+        final int tooManyChallenges =   whateverIsTooMany();
+        final int tooManyToughOnes =    whateverIsTooMany();
+
+        final Map<Difficulty, Integer> criteria = new HashMap<>();
+        criteria.put(Difficulty.EASY, tooManyEasyOnes);
+        criteria.put(Difficulty.AVERAGE, tooManyAverageOnes);
+        criteria.put(Difficulty.CHALLENGING, tooManyChallenges);
+        criteria.put(Difficulty.TOUGH, tooManyToughOnes);
+
+        // Fetch results
+        final List<GameSet> gameSets = gameApi.getRandomByCriteria(criteria);
+        assertNotNull(gameSets);
+
+        // The total number of returned records should (in this case) fit the sum of all records available
+        assertTrue(gameSets.size() == TOTAL_COUNT);
+
+        // The difficulty spread should be as per the stored data
+        final Map<Difficulty, Integer> difficultyMap = new EnumMap<Difficulty, Integer>(Difficulty.class);
+
+        for (GameSet gameSet : gameSets) {
+            assertGameSet(gameSet);
+
+            final Difficulty difficulty = gameSet.getDifficulty();
+            final Integer count = difficultyMap.get(difficulty);
+            difficultyMap.put(difficulty, (count == null) ? 1 : count + 1);
+        }
+
+        assertTrue(difficultyMap.get(Difficulty.EASY)           == INSTANCE_COUNT);
+        assertTrue(difficultyMap.get(Difficulty.AVERAGE)        == INSTANCE_COUNT);
+        assertTrue(difficultyMap.get(Difficulty.CHALLENGING)    == INSTANCE_COUNT);
+        assertTrue(difficultyMap.get(Difficulty.TOUGH)          == INSTANCE_COUNT);
     }
 
     @Test
@@ -246,4 +313,7 @@ public class TmdbGameApiTest {
         return movie;
     }
 
+    private int whateverIsTooMany() {
+        return INSTANCE_COUNT * 2;
+    }
 }

@@ -19,10 +19,7 @@ import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
 
@@ -46,17 +43,17 @@ public class TmdbGameApi implements GameApi {
 
     @Override
     @ApiMethod(path = "/gamesets/random/{count}/{difficulty}", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<GameSet> getRandomGameSetsByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
+    public List<GameSet> getRandomByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
         return randomize(count, gameSetRepository.findByDifficulty(difficulty));
     }
 
     @Override
-    public List<GameSet> getRandomGameSetsByCriteria(Map<Difficulty, Integer> criteria) {
+    public List<GameSet> getRandomByCriteria(Map<Difficulty, Integer> criteria) {
         if (criteria == null || criteria.isEmpty()) return Collections.EMPTY_LIST;
         final List<GameSet> gameSets = new ArrayList<>();
 
         for (Difficulty key : criteria.keySet()) {
-            gameSets.addAll(getRandomGameSetsByDifficulty(criteria.get(key), key));
+            gameSets.addAll(getRandomByDifficulty(criteria.get(key), key));
         }
 
         return gameSets;
@@ -86,12 +83,24 @@ public class TmdbGameApi implements GameApi {
 
     private List<GameSet> randomize(int count, List<GameSet> gameSets) {
         if (gameSets == null || gameSets.isEmpty()) return Collections.EMPTY_LIST;
+        if (gameSets.size() <= count) return gameSets;
+
         final List<GameSet> randomGameSets = new ArrayList<>();
+        final Set<Integer> indices = new HashSet<>();
 
         while (randomGameSets.size() < count) {
-            final GameSet randomGameSet = gameSets.get(AppUtil.randomInt(gameSets.size()));
+            int index = AppUtil.randomInt(gameSets.size());
+
+            // Ensure no two identical items are selected
+            while (indices.contains(index))
+                index = AppUtil.randomInt(gameSets.size());
+
+            final GameSet randomGameSet = gameSets.get(index);
             randomGameSets.add(randomGameSet);
+            indices.add(index);
         }
+
+
         return randomGameSets;
     }
 }

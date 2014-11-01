@@ -20,7 +20,7 @@ public interface GameApi {
      * @param difficulty
      * @return  randomized game sets
      */
-    List<GameSet> getRandomGameSetsByDifficulty(int count, Difficulty difficulty);
+    List<GameSet> getRandomByDifficulty(int count, Difficulty difficulty);
 
     /**
      * Allows for a fine grained random selection. Returns randomized game sets
@@ -29,7 +29,7 @@ public interface GameApi {
      * @param criteria  difficulty quotas, ex.: 2 EASY, 3 AVERAGE ones and 1 TOUGH
      * @return  randomized game sets
      */
-    List<GameSet> getRandomGameSetsByCriteria(Map<Difficulty, Integer> criteria);
+    List<GameSet> getRandomByCriteria(Map<Difficulty, Integer> criteria);
 
     void rate(User user, Long gameSetId, Double rating);
 
