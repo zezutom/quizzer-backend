@@ -17,6 +17,7 @@
             <property name="datanucleus.ConnectionURL" value="appengine"/>
             <property name="datanucleus.appengine.ignorableMetaDataBehavior"
                       value="NONE" />
+            <property name="datanucleus.appengine.datastoreEnableXGTransactions" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>

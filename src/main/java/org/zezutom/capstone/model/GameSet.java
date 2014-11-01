@@ -14,6 +14,9 @@ public class GameSet {
     @Version
     private Long version;
 
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
+
     private String author;
 
     private String explanation;
@@ -43,18 +46,12 @@ public class GameSet {
         this.version = version;
     }
 
-    public void addMovie(Movie movie) {
-        if (movies == null) movies = new ArrayList<>();
-        movies.add(movie);
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    public void addRating(Rating rating) {
-        if (ratings == null) ratings = new ArrayList<>();
-        ratings.add(rating);
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
     }
 
     public List<Rating> getRatings() {
@@ -85,6 +82,20 @@ public class GameSet {
         this.author = author;
     }
 
+    public void addMovie(Movie movie) {
+        if (movies == null) movies = new ArrayList<>();
+        movies.add(movie);
+    }
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void addRating(Rating rating) {
+        if (ratings == null) ratings = new ArrayList<>();
+        ratings.add(rating);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,20 +105,22 @@ public class GameSet {
 
         if (answer != null ? !answer.equals(gameSet.answer) : gameSet.answer != null) return false;
         if (author != null ? !author.equals(gameSet.author) : gameSet.author != null) return false;
+        if (difficulty != gameSet.difficulty) return false;
         if (explanation != null ? !explanation.equals(gameSet.explanation) : gameSet.explanation != null) return false;
-        if (id != null ? !id.equals(gameSet.id) : gameSet.id != null) return false;
-        if (version != null ? !version.equals(gameSet.version) : gameSet.version != null) return false;
+        if (movies != null ? !movies.equals(gameSet.movies) : gameSet.movies != null) return false;
+        if (ratings != null ? !ratings.equals(gameSet.ratings) : gameSet.ratings != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
+        int result = difficulty != null ? difficulty.hashCode() : 0;
         result = 31 * result + (author != null ? author.hashCode() : 0);
         result = 31 * result + (explanation != null ? explanation.hashCode() : 0);
         result = 31 * result + (answer != null ? answer.hashCode() : 0);
+        result = 31 * result + (movies != null ? movies.hashCode() : 0);
+        result = 31 * result + (ratings != null ? ratings.hashCode() : 0);
         return result;
     }
 }

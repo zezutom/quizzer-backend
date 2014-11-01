@@ -1,11 +1,17 @@
 package org.zezutom.capstone.util;
 
+import org.zezutom.capstone.model.Difficulty;
 import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Movie;
 
 public class GameSetBuilder {
 
     private GameSet gameSet = new GameSet();
+
+    public GameSetBuilder setDifficulty(Difficulty difficulty) {
+        gameSet.setDifficulty(difficulty);
+        return this;
+    }
 
     public GameSetBuilder addMovie(Movie movie) {
         gameSet.addMovie(movie);

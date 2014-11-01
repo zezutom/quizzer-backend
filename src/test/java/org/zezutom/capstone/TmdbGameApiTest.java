@@ -12,14 +12,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zezutom.capstone.dao.GameSetRepository;
 import org.zezutom.capstone.dao.ScoreRepository;
-import org.zezutom.capstone.model.GameSet;
-import org.zezutom.capstone.model.Movie;
-import org.zezutom.capstone.model.Rating;
-import org.zezutom.capstone.model.Score;
+import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.service.GameApi;
 import org.zezutom.capstone.util.GameSetBuilder;
 
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -38,13 +35,12 @@ public class TmdbGameApiTest {
     @Autowired
     private ScoreRepository scoreRepository;
 
-    private LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
+            new LocalDatastoreServiceTestConfig().setApplyAllHighRepJobPolicy());
 
     @Before
     public void setUp() {
         helper.setUp();
-        gameSetRepository.save(createGameSet());
-        assertThat(gameSetRepository.count(), is(1L));
     }
 
     @After
@@ -53,31 +49,76 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void getNextGameSet() {
+    public void randomizeByDifficulty() {
 
-        final GameSet gameSet = gameApi.getNextGameSet();
-        assertNotNull(gameSet);
+        // Prepare data
+        gameSetRepository.save(createGameSet(Difficulty.EASY));
+        gameSetRepository.save(createGameSet(Difficulty.EASY));
+        gameSetRepository.save(createGameSet(Difficulty.EASY));
+        gameSetRepository.save(createGameSet(Difficulty.TOUGH));
 
-        // A game set should comprise exactly four movies
-        final List<Movie> movies = gameSet.getMovies();
-        assertNotNull(movies);
-        assertThat(movies.size(), is(4));
+        // Set expectations
+        final int twoEasyOnes = 2;
 
-        // There should be a solution to the game set
-        final Integer answer = gameSet.getAnswer();
-        assertNotNull(answer);
+        // Fetch results
+        final List<GameSet> gameSets = gameApi.getRandomGameSetsByDifficulty(twoEasyOnes, Difficulty.EASY);
+        assertNotNull(gameSets);
 
-        // The solution should refer to one of the 4 movies
-        assertTrue(answer >= 0 && answer < movies.size());
+        // The total number of returned records should (in this case) fit the requested count
+        assertTrue(gameSets.size() == twoEasyOnes);
 
-        // and an explanation should be provided
-        assertNotNull(gameSet.getExplanation());
+        // Verify individual game sets
+        for (GameSet gameSet : gameSets) assertGameSet(gameSet, Difficulty.EASY);
+    }
+
+    @Test
+    public void randomizeByCriteria() {
+
+        // Prepare data
+        gameSetRepository.save(createGameSet(Difficulty.EASY));
+        gameSetRepository.save(createGameSet(Difficulty.AVERAGE));
+        gameSetRepository.save(createGameSet(Difficulty.CHALLENGING));
+        gameSetRepository.save(createGameSet(Difficulty.CHALLENGING));
+        gameSetRepository.save(createGameSet(Difficulty.TOUGH));
+
+        // Set expectations
+        final int anAverageOne = 1;
+        final int twoChallenges = 2;
+        final int aToughOne = 1;
+
+        final Map<Difficulty, Integer> criteria = new HashMap<>();
+        criteria.put(Difficulty.AVERAGE, anAverageOne);
+        criteria.put(Difficulty.CHALLENGING, twoChallenges);
+        criteria.put(Difficulty.TOUGH, aToughOne);
+
+        // Fetch results
+        final List<GameSet> gameSets = gameApi.getRandomGameSetsByCriteria(criteria);
+        assertNotNull(gameSets);
+
+        // The total number of returned records should (in this case) fit the sum of all requested counts
+        assertTrue(gameSets.size() == anAverageOne + twoChallenges + aToughOne);
+
+        // The difficulty spread should be as per the criteria
+        final Map<Difficulty, Integer> difficultyMap = new EnumMap<Difficulty, Integer>(Difficulty.class);
+
+        for (GameSet gameSet : gameSets) {
+            assertGameSet(gameSet);
+
+            final Difficulty difficulty = gameSet.getDifficulty();
+            final Integer count = difficultyMap.get(difficulty);
+            difficultyMap.put(difficulty, (count == null) ? 1 : count + 1);
+        }
+
+        assertTrue(difficultyMap.get(Difficulty.AVERAGE) == anAverageOne);
+        assertTrue(difficultyMap.get(Difficulty.CHALLENGING) == twoChallenges);
+        assertTrue(difficultyMap.get(Difficulty.TOUGH) == aToughOne);
     }
 
     @Test
     public void rate() {
+
         // Retrieve a game set
-        GameSet gameSet = gameApi.getNextGameSet();
+        GameSet gameSet = createDefaultGameSet();
         assertNotNull(gameSet);
 
         // rate it
@@ -125,6 +166,7 @@ public class TmdbGameApiTest {
     public void addGameSet() {
 
         final GameSet gameSet = new GameSetBuilder()
+                .setDifficulty(Difficulty.AVERAGE)
                 .addMovie(createMovie("The Wolf of Wall Street", "7.5", 2013, "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"))
                 .addMovie(createMovie("The Hunger Games", "6.9", 2012, "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"))
                 .addMovie(createMovie("The Hobbit", "4.3", 2012, "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"))
@@ -136,22 +178,58 @@ public class TmdbGameApiTest {
         assertThat(gameApi.addGameSet(createUser(), gameSet), is(gameSet));
     }
 
-    private GameSet createGameSet() {
+    private GameSet createDefaultGameSet() {
+        return gameSetRepository.save(createGameSet(Difficulty.AVERAGE));
+    }
+
+    private void assertGameSet(GameSet gameSet) {
+        // A game set should comprise exactly four movies
+        final List<Movie> movies = gameSet.getMovies();
+        assertNotNull(movies);
+        assertThat(movies.size(), is(4));
+
+        // There should be a solution to the game set
+        final Integer answer = gameSet.getAnswer();
+        assertNotNull(answer);
+
+        // The solution should refer to one of the 4 movies
+        assertTrue(answer >= 0 && answer < movies.size());
+
+        // and an explanation should be provided
+        assertNotNull(gameSet.getExplanation());
+    }
+
+    private void assertGameSet(GameSet gameSet, Difficulty difficulty) {
+        assertGameSet(gameSet);
+        assertThat(gameSet.getDifficulty(), is(difficulty));
+    }
+
+    private GameSet createGameSet(Difficulty difficulty) {
         GameSet gameSet = new GameSet();
+        gameSet.setDifficulty(difficulty);
 
         // Add movies
-        gameSet.addMovie(createMovie("The Terminal", "6.8", 2004, "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"));
-        gameSet.addMovie(createMovie("The Terminal Man", "0.0", 1974, "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"));
-        gameSet.addMovie(createMovie("The Smashing Pumpkins: Terminal 5", "9.5", 2011, "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"));
-        gameSet.addMovie(createMovie("The Terminal Trust", "3.0", 2012, "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"));
+        for (Movie movie : getMovies()) gameSet.addMovie(movie);
 
-        // Select the answer
-        gameSet.setAnswer(1);
+        // Randomize an answer
+        Random random = new Random();
+        gameSet.setAnswer(random.nextInt(gameSet.getMovies().size() - 1));
 
         // Explanation
-        gameSet.setExplanation("It hasn't been rated so far!");
+        gameSet.setExplanation("Just for the mockery of it!");
 
         return gameSet;
+    }
+
+    private List<Movie> getMovies() {
+        final List<Movie> movies = new ArrayList<>();
+
+        movies.add(createMovie("The Terminal", "6.8", 2004, "/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg"));
+        movies.add(createMovie("The Terminal Man", "0.0", 1974, "/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg"));
+        movies.add(createMovie("The Smashing Pumpkins: Terminal 5", "9.5", 2011, "/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg"));
+        movies.add(createMovie("The Terminal Trust", "3.0", 2012, "/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg"));
+
+        return movies;
     }
 
     private User createUser() {

@@ -1,6 +1,7 @@
 package org.zezutom.capstone.service;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.zezutom.capstone.dao.GameSetRepository;
 import org.zezutom.capstone.dao.ScoreRepository;
+import org.zezutom.capstone.model.Difficulty;
 import org.zezutom.capstone.model.GameSet;
 import org.zezutom.capstone.model.Rating;
 import org.zezutom.capstone.model.Score;
@@ -17,7 +19,10 @@ import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
 
@@ -40,10 +45,21 @@ public class TmdbGameApi implements GameApi {
     }
 
     @Override
-    public GameSet getNextGameSet() {
-        final List<GameSet> gameSets = gameSetRepository.findAll();
-        if (gameSets == null || gameSets.isEmpty()) return null;
-        return gameSets.get(AppUtil.randomInt(gameSets.size()));
+    @ApiMethod(path = "/gamesets/random/{count}/{difficulty}", httpMethod = ApiMethod.HttpMethod.GET)
+    public List<GameSet> getRandomGameSetsByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
+        return randomize(count, gameSetRepository.findByDifficulty(difficulty));
+    }
+
+    @Override
+    public List<GameSet> getRandomGameSetsByCriteria(Map<Difficulty, Integer> criteria) {
+        if (criteria == null || criteria.isEmpty()) return Collections.EMPTY_LIST;
+        final List<GameSet> gameSets = new ArrayList<>();
+
+        for (Difficulty key : criteria.keySet()) {
+            gameSets.addAll(getRandomGameSetsByDifficulty(criteria.get(key), key));
+        }
+
+        return gameSets;
     }
 
     @Transactional
@@ -68,11 +84,14 @@ public class TmdbGameApi implements GameApi {
         scoreRepository.save(score);
     }
 
-    // TODO deleteme
-    public Score getFakeScore(User user) {
-        if (user == null)
-            return new Score(0, "anonymous");
-        else
-            return new Score(100, user.getEmail());
+    private List<GameSet> randomize(int count, List<GameSet> gameSets) {
+        if (gameSets == null || gameSets.isEmpty()) return Collections.EMPTY_LIST;
+        final List<GameSet> randomGameSets = new ArrayList<>();
+
+        while (randomGameSets.size() < count) {
+            final GameSet randomGameSet = gameSets.get(AppUtil.randomInt(gameSets.size()));
+            randomGameSets.add(randomGameSet);
+        }
+        return randomGameSets;
     }
 }
