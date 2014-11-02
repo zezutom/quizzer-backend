@@ -1,5 +1,7 @@
 package org.zezutom.capstone.model;
 
+import org.datanucleus.api.jpa.annotations.Extension;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +10,9 @@ import java.util.List;
 public class GameSet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
+    private String id;
 
     @Version
     private Long version;
@@ -23,18 +26,17 @@ public class GameSet {
 
     private Integer answer;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Movie> movies;
 
-    // TODO replace with lazy loading (you'd have to encounter for detached objects)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "gameSet")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Rating> ratings;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -52,10 +54,6 @@ public class GameSet {
 
     public void setDifficulty(Difficulty difficulty) {
         this.difficulty = difficulty;
-    }
-
-    public List<Rating> getRatings() {
-        return ratings;
     }
 
     public String getExplanation() {
@@ -87,6 +85,10 @@ public class GameSet {
         movies.add(movie);
     }
 
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
+    }
+
     public List<Movie> getMovies() {
         return movies;
     }
@@ -94,6 +96,10 @@ public class GameSet {
     public void addRating(Rating rating) {
         if (ratings == null) ratings = new ArrayList<>();
         ratings.add(rating);
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
     }
 
     @Override
@@ -107,20 +113,20 @@ public class GameSet {
         if (author != null ? !author.equals(gameSet.author) : gameSet.author != null) return false;
         if (difficulty != gameSet.difficulty) return false;
         if (explanation != null ? !explanation.equals(gameSet.explanation) : gameSet.explanation != null) return false;
-        if (movies != null ? !movies.equals(gameSet.movies) : gameSet.movies != null) return false;
-        if (ratings != null ? !ratings.equals(gameSet.ratings) : gameSet.ratings != null) return false;
+        if (id != null ? !id.equals(gameSet.id) : gameSet.id != null) return false;
+        if (version != null ? !version.equals(gameSet.version) : gameSet.version != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = difficulty != null ? difficulty.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (difficulty != null ? difficulty.hashCode() : 0);
         result = 31 * result + (author != null ? author.hashCode() : 0);
         result = 31 * result + (explanation != null ? explanation.hashCode() : 0);
         result = 31 * result + (answer != null ? answer.hashCode() : 0);
-        result = 31 * result + (movies != null ? movies.hashCode() : 0);
-        result = 31 * result + (ratings != null ? ratings.hashCode() : 0);
         return result;
     }
 }

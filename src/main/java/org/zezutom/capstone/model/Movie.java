@@ -6,8 +6,6 @@ import org.datanucleus.api.jpa.annotations.Extension;
 import org.zezutom.capstone.util.AppUtil;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -35,8 +33,9 @@ public class Movie {
 
     private String basePath;
 
-    @ManyToMany
-    private List<GameSet> gameSets;
+    @Basic
+    @Extension(vendorName = "datanucleus", key = "gae.parent-pk", value = "true")
+    private String gameSetId;
 
     public Movie() {}
 
@@ -59,6 +58,14 @@ public class Movie {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getGameSetId() {
+        return gameSetId;
+    }
+
+    public void setGameSetId(String gameSetId) {
+        this.gameSetId = gameSetId;
     }
 
     public String getTitle() {
@@ -109,12 +116,7 @@ public class Movie {
 
     @JsonProperty("release_date")
     public void setReleaseYear(String date) {
-        this.year = AppUtil.parseYear(date);
-    }
-
-    public void addGameSet(GameSet gameSet) {
-        if (gameSets == null) gameSets = new ArrayList<>();
-        gameSets.add(gameSet);
+        setYear(AppUtil.parseYear(date));
     }
 
     @Override

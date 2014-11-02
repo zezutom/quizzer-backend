@@ -19,22 +19,15 @@ public class Rating {
 
     private Double value;
 
-    @ManyToOne
-    private GameSet gameSet;
+    @Basic
+    @Extension(vendorName = "datanucleus", key = "gae.parent-pk", value = "true")
+    private String gameSetId;
 
     public Rating() {}
 
     public Rating(Double value, String username) {
         this.value = value;
         this.username = username;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 
     public String getId() {
@@ -45,19 +38,27 @@ public class Rating {
         this.id = id;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public String getGameSetId() {
+        return gameSetId;
+    }
+
+    public void setGameSetId(String gameSetId) {
+        this.gameSetId = gameSetId;
+    }
+
     public String getUsername() {
         return username;
     }
 
     public Double getValue() {
         return value;
-    }
-
-    public GameSet getGameSet() {
-        return gameSet;
-    }
-
-    public void setGameSet(GameSet gameSet) {
-        this.gameSet = gameSet;
     }
 }

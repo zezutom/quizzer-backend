@@ -1,5 +1,7 @@
 package org.zezutom.capstone.model;
 
+import org.datanucleus.api.jpa.annotations.Extension;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -7,8 +9,9 @@ import java.util.Date;
 public class Score {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
+    private String id;
 
     @Version
     private Long version;
@@ -26,11 +29,11 @@ public class Score {
         this.username = username;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

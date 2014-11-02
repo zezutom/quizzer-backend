@@ -1,12 +1,12 @@
 package org.zezutom.capstone.service;
 
 import com.google.api.server.spi.config.Api;
-import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.zezutom.capstone.dao.GameSetRepository;
@@ -41,19 +41,36 @@ public class TmdbGameApi implements GameApi {
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
-    @ApiMethod(path = "/gamesets/random/{count}/{difficulty}", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<GameSet> getRandomByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
+    public List<GameSet> getNextFive() {
+        final List<GameSet> gameSets = new ArrayList<>();
+        final int max_loops = 20;
+        int i = 0;
+
+        while(gameSets.size() < 5 && i < max_loops) {
+            int index = AppUtil.randomInt(Difficulty.values().length);
+            gameSets.addAll(getByDifficulty(1, Difficulty.values()[index]));
+            i++;
+        }
+
+        return gameSets;
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @Override
+    public List<GameSet> getByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
         return randomize(count, gameSetRepository.findByDifficulty(difficulty));
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
-    public List<GameSet> getRandomByCriteria(Map<Difficulty, Integer> criteria) {
+    public List<GameSet> getByCriteria(Map<Difficulty, Integer> criteria) {
         if (criteria == null || criteria.isEmpty()) return Collections.EMPTY_LIST;
         final List<GameSet> gameSets = new ArrayList<>();
 
         for (Difficulty key : criteria.keySet()) {
-            gameSets.addAll(getRandomByDifficulty(criteria.get(key), key));
+            gameSets.addAll(getByDifficulty(criteria.get(key), key));
         }
 
         return gameSets;
@@ -68,10 +85,10 @@ public class TmdbGameApi implements GameApi {
 
     @Transactional
     @Override
-    public void rate(User user, @Named("gameSetId") Long gameSetId, @Named("rating") Double rating) {
+    public void rate(User user, @Named("gameSetId") String gameSetId, @Named("rating") Double rating) {
         GameSet gameSet = gameSetRepository.findOne(gameSetId);
         gameSet.addRating(new Rating(rating, AppUtil.getUsername(user)));
-        gameSetRepository.save(gameSet);
+        gameSetRepository.saveAndFlush(gameSet);
     }
 
     @Transactional

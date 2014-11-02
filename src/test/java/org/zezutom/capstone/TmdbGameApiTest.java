@@ -5,20 +5,19 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zezutom.capstone.dao.GameSetRepository;
+import org.zezutom.capstone.dao.RatingRepository;
 import org.zezutom.capstone.dao.ScoreRepository;
 import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.service.GameApi;
 import org.zezutom.capstone.util.GameSetBuilder;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -40,31 +39,21 @@ public class TmdbGameApiTest {
     private GameSetRepository gameSetRepository;
 
     @Autowired
-    private ScoreRepository scoreRepository;
+    private RatingRepository ratingRepository;
 
     @Autowired
-    private EntityManagerFactory entityManagerFactory;
+    private ScoreRepository scoreRepository;
 
-    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
-            new LocalDatastoreServiceTestConfig().setApplyAllHighRepJobPolicy());
+    private final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
 
     @Before
     public void setUp() {
         helper.setUp();
 
-        // To overcame the GAE's limitation of max 5 entity instances per transaction
-        // I have no choice but to resort to nested transactions
-
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
-
         // I want a full range of difficulties, 3 game sets of each type
-        for (int i = 0; i < INSTANCE_COUNT; i++) {
-            transaction.begin();
+        for (int i = 0; i < INSTANCE_COUNT; i++)
             for (Difficulty difficulty : Difficulty.values())
                 gameSetRepository.save(createGameSet(difficulty));
-            transaction.commit();
-        }
     }
 
     @After
@@ -73,13 +62,22 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void randomizeByDifficulty() {
+    public void getNextFive() {
+        List<GameSet> gameSets = gameApi.getNextFive();
+        assertNotNull(gameSets);
+        assertTrue(gameSets.size() == 5);
+
+        for (GameSet gameSet : gameSets) assertGameSet(gameSet);
+    }
+
+    @Test
+    public void getByDifficulty() {
 
         // Set expectations
         final int twoEasyOnes = 2;
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomByDifficulty(twoEasyOnes, Difficulty.EASY);
+        final List<GameSet> gameSets = gameApi.getByDifficulty(twoEasyOnes, Difficulty.EASY);
         assertNotNull(gameSets);
 
         // The total number of returned records should (in this case) fit the requested count
@@ -90,13 +88,13 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void randomizeByDifficultyTooFewRecords() {
+    public void getByDifficultyTooFewRecords() {
 
         // Set expectations - there is not enough data for this
         final int tooManyEasyOnes = whateverIsTooMany();
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomByDifficulty(tooManyEasyOnes, Difficulty.EASY);
+        final List<GameSet> gameSets = gameApi.getByDifficulty(tooManyEasyOnes, Difficulty.EASY);
         assertNotNull(gameSets);
 
         // The total number of returned records should be the same as the number of total records available
@@ -107,7 +105,7 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void randomizeByCriteria() {
+    public void getByCriteria() {
 
         // Set expectations
         final int anAverageOne = 1;
@@ -120,7 +118,7 @@ public class TmdbGameApiTest {
         criteria.put(Difficulty.TOUGH, aToughOne);
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomByCriteria(criteria);
+        final List<GameSet> gameSets = gameApi.getByCriteria(criteria);
         assertNotNull(gameSets);
 
         // The total number of returned records should (in this case) fit the sum of all requested counts
@@ -143,7 +141,7 @@ public class TmdbGameApiTest {
     }
 
     @Test
-    public void randomizeByCriteriaTooFewRecords() {
+    public void getByCriteriaTooFewRecords() {
 
         // Set expectations - note that there isn't enough data
         final int tooManyEasyOnes =     whateverIsTooMany();
@@ -158,7 +156,7 @@ public class TmdbGameApiTest {
         criteria.put(Difficulty.TOUGH, tooManyToughOnes);
 
         // Fetch results
-        final List<GameSet> gameSets = gameApi.getRandomByCriteria(criteria);
+        final List<GameSet> gameSets = gameApi.getByCriteria(criteria);
         assertNotNull(gameSets);
 
         // The total number of returned records should (in this case) fit the sum of all records available
@@ -194,8 +192,7 @@ public class TmdbGameApiTest {
         gameApi.rate(user, gameSet.getId(), value);
 
         // verify the rating was saved
-        gameSet = gameSetRepository.getOne(gameSet.getId());
-        final List<Rating> ratings = gameSet.getRatings();
+        final List<Rating> ratings = ratingRepository.findByGameSetId(gameSet.getId());
         assertThat(ratings.size(), is(1));
 
         // and check the value is as expected

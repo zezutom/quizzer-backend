@@ -257,7 +257,7 @@
                 <version>${datanucleus.version}</version>
                 <configuration>
                     <api>JPA</api>
-                    <persistenceUnitName>myPU</persistenceUnitName>
+                    <persistenceUnitName>jpa.unit</persistenceUnitName>
                     <log4jConfiguration>${basedir}/src/main/resources/log4j.properties</log4jConfiguration>
                     <verbose>true</verbose>
                     <fork>false</fork>

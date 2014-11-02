@@ -12,6 +12,8 @@ import java.util.Map;
  */
 public interface GameApi {
 
+    List<GameSet> getNextFive();
+
     /**
      * Returns a random selection comprising the given number of game sets,
      * all of them being of the same level of difficulty.
@@ -20,7 +22,7 @@ public interface GameApi {
      * @param difficulty
      * @return  randomized game sets
      */
-    List<GameSet> getRandomByDifficulty(int count, Difficulty difficulty);
+    List<GameSet> getByDifficulty(int count, Difficulty difficulty);
 
     /**
      * Allows for a fine grained random selection. Returns randomized game sets
@@ -29,9 +31,9 @@ public interface GameApi {
      * @param criteria  difficulty quotas, ex.: 2 EASY, 3 AVERAGE ones and 1 TOUGH
      * @return  randomized game sets
      */
-    List<GameSet> getRandomByCriteria(Map<Difficulty, Integer> criteria);
+    List<GameSet> getByCriteria(Map<Difficulty, Integer> criteria);
 
-    void rate(User user, Long gameSetId, Double rating);
+    void rate(User user, String gameSetId, Double rating);
 
     void score(User user, Integer points);
 
