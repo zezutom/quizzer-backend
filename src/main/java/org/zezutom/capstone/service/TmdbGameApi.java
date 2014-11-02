@@ -1,6 +1,7 @@
 package org.zezutom.capstone.service;
 
 import com.google.api.server.spi.config.Api;
+import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
@@ -42,6 +43,7 @@ public class TmdbGameApi implements GameApi {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @ApiMethod(name = "getNextFive", path = "get_next_five", httpMethod = ApiMethod.HttpMethod.GET)
     @Override
     public List<GameSet> getNextFive() {
         final List<GameSet> gameSets = new ArrayList<>();
@@ -58,12 +60,14 @@ public class TmdbGameApi implements GameApi {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @ApiMethod(name = "getByDifficulty", path = "get_by_difficulty", httpMethod = ApiMethod.HttpMethod.GET)
     @Override
     public List<GameSet> getByDifficulty(@Named("count") int count, @Named("difficulty") Difficulty difficulty) {
         return randomize(count, gameSetRepository.findByDifficulty(difficulty));
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @ApiMethod(name = "getByCriteria", path = "get_by_criteria", httpMethod = ApiMethod.HttpMethod.POST)
     @Override
     public List<GameSet> getByCriteria(Map<Difficulty, Integer> criteria) {
         if (criteria == null || criteria.isEmpty()) return Collections.EMPTY_LIST;
