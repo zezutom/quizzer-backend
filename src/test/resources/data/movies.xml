@@ -1,7 +1,0 @@
-<dataset>
-    <movies id="1" version="0" title="The Terminal" rating="6.8" year="2004" imageUrl="/f4Dup6awDfDqAHKgWqNJ2HFw1qN.jpg" basePath="https://image.tmdb.org/t/p" />
-    <movies id="2" version="0" title="The Terminal Man" rating="0.0" year="1974" imageUrl="/b2SUvKY4ZkkY9a1OzW9uetbW8vx.jpg" basePath="https://image.tmdb.org/t/p" />
-    <movies id="3" version="0" title="The Smashing Pumpkins: Terminal 5" rating="9.5" year="2011" imageUrl="/t4rHBaoIMFbN0hRbqxCfinW3VkQ.jpg" basePath="https://image.tmdb.org/t/p" />
-    <movies id="4" version="0" title="Prison Terminal: The Last Days of Private Jack Hall" rating="0.0" year="2013" imageUrl="/knCEuyiUJvEgbn1POhoVe0ivI5E.jpg" basePath="https://image.tmdb.org/t/p" />
-    <movies id="5" version="0" title="The Terminal Trust" rating="3.0" year="2012" imageUrl="/kHwBfsvYOY8url7KrCtBRbXBpiB.jpg" basePath="https://image.tmdb.org/t/p" />
-</dataset>

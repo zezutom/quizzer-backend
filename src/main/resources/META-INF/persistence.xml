@@ -6,16 +6,17 @@
 
     <persistence-unit name="jpa.unit" transaction-type="RESOURCE_LOCAL">
         <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
-        <class>org.zezutom.capstone.model.GameSet</class>
-        <class>org.zezutom.capstone.model.Movie</class>
-        <class>org.zezutom.capstone.model.Rating</class>
-        <class>org.zezutom.capstone.model.Score</class>
+        <class>org.zezutom.capstone.domain.GameResult</class>
+        <class>org.zezutom.capstone.domain.PlayoffResult</class>
+        <class>org.zezutom.capstone.domain.Quiz</class>
+        <class>org.zezutom.capstone.domain.QuizRating</class>
+        <class>org.zezutom.capstone.domain.UserStats</class>
         <exclude-unlisted-classes />
         <properties>
             <property name="datanucleus.ConnectionURL" value="appengine"/>
             <property name="datanucleus.appengine.ignorableMetaDataBehavior"
                       value="NONE" />
-            <!--property name="datanucleus.appengine.datastoreEnableXGTransactions" value="true"/-->
+            <property name="datanucleus.appengine.datastoreEnableXGTransactions" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
