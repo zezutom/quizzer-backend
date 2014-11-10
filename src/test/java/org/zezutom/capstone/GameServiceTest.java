@@ -36,11 +36,13 @@ public class GameServiceTest {
     @Before
     public void setUp() {
         helper.setUp();
+        TestUtil.login();
     }
 
     @After
     public void tearDown() {
         helper.tearDown();
+        TestUtil.logout();
     }
 
     @Test
@@ -51,7 +53,7 @@ public class GameServiceTest {
         gameService.saveSingleGame(user, gameResult);
 
         // Verify the result has been correctly saved and is associated with the expected user
-        final List<GameResult> gameResults = gameResultRepository.findByUsername(AppUtil.getUsername(user));
+        final List<GameResult> gameResults = gameResultRepository.findByUsername(AppUtil.getUsername());
         TestUtil.assertEntities(1, gameResults);
         TestUtil.assertGameResult(gameResults.get(0), gameResult);
     }
@@ -65,7 +67,7 @@ public class GameServiceTest {
         gameService.savePlayoff(user, playoffResult);
 
         // Verify the result has been correctly saved and is associated with the expected user
-        final List<PlayoffResult> playoffResults = playoffResultRepository.findByUsername(AppUtil.getUsername(user));
+        final List<PlayoffResult> playoffResults = playoffResultRepository.findByUsername(AppUtil.getUsername());
         TestUtil.assertEntities(1, playoffResults);
         TestUtil.assertPlayOffResult(playoffResults.get(0), playoffResult);
     }

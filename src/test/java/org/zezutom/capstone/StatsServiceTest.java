@@ -40,11 +40,13 @@ public class StatsServiceTest {
     @Before
     public void setUp() {
         helper.setUp();
+        TestUtil.login();
     }
 
     @After
     public void tearDown() {
         helper.tearDown();
+        TestUtil.logout();
     }
 
     @Test

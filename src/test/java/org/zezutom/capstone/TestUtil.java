@@ -3,14 +3,16 @@ package org.zezutom.capstone;
 import com.google.appengine.api.users.User;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.zezutom.capstone.domain.*;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class TestUtil {
 
@@ -62,7 +64,7 @@ public class TestUtil {
         return userStats;
     }
 
-    public static<T extends AuditableEntity> void assertEntities(int expectedSize, List<T> entities) {
+    public static<T extends GenericEntity> void assertEntities(int expectedSize, List<T> entities) {
         assertNotNull(entities);
         assertTrue(entities.size() == expectedSize);
         for (T entity : entities) {
@@ -71,7 +73,7 @@ public class TestUtil {
 
     }
 
-    public static<T extends AuditableEntity> void assertEntity(T entity) {
+    public static<T extends GenericEntity> void assertEntity(T entity) {
         assertNotNull(entity);
         assertNotNull(entity.getId());
         assertNotNull(entity.getVersion());
@@ -97,5 +99,15 @@ public class TestUtil {
         return new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig().setApplyAllHighRepJobPolicy());
     }
 
+    public static void login() {
+        User user = createUser();
+        TestingAuthenticationToken token = new TestingAuthenticationToken(user, null);
+        OAuth2Request req = new OAuth2Request(null, user.getEmail(), null, true, null, null, null, null, null);
+        OAuth2Authentication auth = new OAuth2Authentication(req, token);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
 
+    public static void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
 }

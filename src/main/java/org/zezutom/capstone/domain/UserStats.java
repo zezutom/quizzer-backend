@@ -1,9 +1,6 @@
 package org.zezutom.capstone.domain;
 
-import org.datanucleus.api.jpa.annotations.Extension;
-
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
 
 /**
  * User statistics - keeps a track of the very best achievements of a particular user.
@@ -24,21 +21,7 @@ import java.util.Date;
  *
  */
 @Entity
-@EntityListeners(AuditableListener.class)
-public class UserStats implements AuditableEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
-    private String id;
-
-    @Version
-    private Long version;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-
-    private String username;
+public class UserStats extends GenericEntity {
 
     private int score;
 
@@ -51,43 +34,6 @@ public class UserStats implements AuditableEntity {
     private int roundTwoRatio;
 
     private int roundThreeRatio;
-
-    public UserStats() {
-    }
-
-    public UserStats(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public Long getVersion() {
-        return version;
-    }
-
-    @Override
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public int getScore() {
         return score;
@@ -150,21 +96,13 @@ public class UserStats implements AuditableEntity {
         if (roundThreeRatio != userStats.roundThreeRatio) return false;
         if (roundTwoRatio != userStats.roundTwoRatio) return false;
         if (score != userStats.score) return false;
-        if (createdAt != null ? !createdAt.equals(userStats.createdAt) : userStats.createdAt != null) return false;
-        if (id != null ? !id.equals(userStats.id) : userStats.id != null) return false;
-        if (username != null ? !username.equals(userStats.username) : userStats.username != null) return false;
-        if (version != null ? !version.equals(userStats.version) : userStats.version != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + score;
+        int result = score;
         result = 31 * result + round;
         result = 31 * result + powerUps;
         result = 31 * result + roundOneRatio;

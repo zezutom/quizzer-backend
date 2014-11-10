@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by tom on 03/11/2014.
  */
-public interface GameResultRepository extends JpaRepository<GameResult, String> {
+public interface GameResultRepository extends GenericEntityRepository<GameResult> {
 
     List<GameResult> findByUsername(String username);
 }

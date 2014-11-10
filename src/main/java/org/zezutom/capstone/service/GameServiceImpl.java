@@ -40,18 +40,15 @@ public class GameServiceImpl implements GameService {
     @Override
     @ApiMethod(path = "singlegame/save", httpMethod = ApiMethod.HttpMethod.POST)
     public void saveSingleGame(User user, GameResult gameResult) {
-        AppUtil.audit(user, gameResult);
         gameResultRepository.save(gameResult);
 
-        final String username = AppUtil.getUsername(user);
-        UserStats userStats = userStatsRepository.findByUsername(username);
+        UserStats userStats = userStatsRepository.findByUsername(AppUtil.getUsername());
 
         if (userStats == null)
             userStats = createUserStats(user, gameResult);
         else
             userStats = updateUserStats(userStats, gameResult);
 
-        AppUtil.audit(user, userStats);
         userStatsRepository.save(userStats);
     }
 
@@ -59,7 +56,6 @@ public class GameServiceImpl implements GameService {
     @Override
     @ApiMethod(path = "playoff/save", httpMethod = ApiMethod.HttpMethod.POST)
     public void savePlayoff(User user, PlayoffResult playoffResult) {
-        AppUtil.audit(user, playoffResult);
         playoffResultRepository.save(playoffResult);
     }
 

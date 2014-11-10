@@ -45,19 +45,19 @@ public class StatsServiceImpl implements StatsService {
     @Override
     @ApiMethod(path = "userstats/get", httpMethod = ApiMethod.HttpMethod.GET)
     public UserStats getUserStats(User user) {
-        return userStatsRepository.findByUsername(AppUtil.getUsername(user));
+        return userStatsRepository.findByUsername(AppUtil.getUsername());
     }
 
     @Override
     @ApiMethod(path = "singlegame/history", httpMethod = ApiMethod.HttpMethod.GET)
     public List<GameResult> getSingleGameHistory(User user) {
-        return gameResultRepository.findByUsername(AppUtil.getUsername(user));
+        return gameResultRepository.findByUsername(AppUtil.getUsername());
     }
 
     @Override
     @ApiMethod(path = "playoff/history", httpMethod = ApiMethod.HttpMethod.GET)
     public List<PlayoffResult> getPlayoffHistory(User user) {
-        return playoffResultRepository.findByUsername(AppUtil.getUsername(user));
+        return playoffResultRepository.findByUsername(AppUtil.getUsername());
     }
 
     @Override

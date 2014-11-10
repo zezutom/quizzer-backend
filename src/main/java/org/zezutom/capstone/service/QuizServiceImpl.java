@@ -42,7 +42,6 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @ApiMethod(path = "quiz/add", httpMethod = ApiMethod.HttpMethod.POST)
     public void addNew(User user, Quiz quiz) {
-        AppUtil.audit(user, quiz);
         quizRepository.save(quiz);
     }
 
@@ -50,7 +49,7 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @ApiMethod(path = "quiz/rate", httpMethod = ApiMethod.HttpMethod.POST)
     public void rate(User user, String quizId, boolean liked) {
-        Quiz quiz = quizRepository.findOne(quizId);
+        Quiz quiz = quizRepository.findOne(AppUtil.sanitize(quizId));
         if (liked) quiz.upVote(); else quiz.downVote();
         quizRepository.save(quiz);
 
@@ -60,7 +59,6 @@ public class QuizServiceImpl implements QuizService {
         else
             quizRating = updateQuizRating(quizRating, quiz);
 
-        AppUtil.audit(user, quizRating);
         quizRatingRepository.save(quizRating);
     }
 

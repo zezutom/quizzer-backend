@@ -1,14 +1,26 @@
 package org.zezutom.capstone;
 
 import com.google.appengine.api.users.User;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.zezutom.capstone.domain.GameResult;
 import org.zezutom.capstone.util.AppUtil;
 
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 
 public class AppUtilTest {
+
+    @Before
+    public void setUp() {
+        TestUtil.login();
+    }
+
+    @After
+    public void tearDown() {
+        TestUtil.logout();
+    }
 
     @Test
     public void randomInt() {
@@ -18,19 +30,15 @@ public class AppUtilTest {
     }
 
     @Test
-    public void audit() {
+    public void getUsername() {
         final User user = TestUtil.createUser();
-        final GameResult gameResult = TestUtil.createGameResult();
-
-        assertNull(gameResult.getUsername());
-        AppUtil.audit(user, gameResult);
-        assertThat(gameResult.getUsername(), is(AppUtil.getUsername(user)));
-
+        assertThat(AppUtil.getUsername(), is(user.getEmail()));
     }
 
     @Test
-    public void getUsername() {
-        final User user = TestUtil.createUser();
-        assertNotNull(AppUtil.getUsername(user));
+    public void sanitize() {
+        final String unsafe = "<p><a href='http://example.com/' onclick='stealCookies()'>Link</a></p>";
+        final String sanitized = "<p><a href=\"http://example.com/\" rel=\"nofollow\">Link</a></p>";
+        assertThat(AppUtil.sanitize(unsafe), is(sanitized));
     }
 }

@@ -35,21 +35,7 @@ import java.util.Date;
  *
  */
 @Entity
-@EntityListeners(AuditableListener.class)
-public class Quiz implements AuditableEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Extension(vendorName = "datanucleus", key = "gae.encoded-pk", value = "true")
-    private String id;
-
-    @Version
-    private Long version;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
-
-    private String username;
+public class Quiz extends GenericEntity {
 
     private String title;
 
@@ -77,36 +63,6 @@ public class Quiz implements AuditableEntity {
 
     public Quiz(String title) {
         this.title = title;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public Long getVersion() {
-        return version;
-    }
-
-    @Override
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    @Override
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getTitle() {
@@ -205,27 +161,19 @@ public class Quiz implements AuditableEntity {
         if (downVotes != quiz.downVotes) return false;
         if (ratingCount != quiz.ratingCount) return false;
         if (upVotes != quiz.upVotes) return false;
-        if (createdAt != null ? !createdAt.equals(quiz.createdAt) : quiz.createdAt != null) return false;
         if (explanation != null ? !explanation.equals(quiz.explanation) : quiz.explanation != null) return false;
-        if (id != null ? !id.equals(quiz.id) : quiz.id != null) return false;
         if (movieFour != null ? !movieFour.equals(quiz.movieFour) : quiz.movieFour != null) return false;
         if (movieOne != null ? !movieOne.equals(quiz.movieOne) : quiz.movieOne != null) return false;
         if (movieThree != null ? !movieThree.equals(quiz.movieThree) : quiz.movieThree != null) return false;
         if (movieTwo != null ? !movieTwo.equals(quiz.movieTwo) : quiz.movieTwo != null) return false;
         if (title != null ? !title.equals(quiz.title) : quiz.title != null) return false;
-        if (username != null ? !username.equals(quiz.username) : quiz.username != null) return false;
-        if (version != null ? !version.equals(quiz.version) : quiz.version != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (version != null ? version.hashCode() : 0);
-        result = 31 * result + (createdAt != null ? createdAt.hashCode() : 0);
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (title != null ? title.hashCode() : 0);
+        int result = title != null ? title.hashCode() : 0;
         result = 31 * result + (movieOne != null ? movieOne.hashCode() : 0);
         result = 31 * result + (movieTwo != null ? movieTwo.hashCode() : 0);
         result = 31 * result + (movieThree != null ? movieThree.hashCode() : 0);

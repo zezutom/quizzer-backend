@@ -35,11 +35,13 @@ public class QuizServiceTest {
     @Before
     public void setUp() {
         helper.setUp();
+        TestUtil.login();
     }
 
     @After
     public void tearDown() {
         helper.tearDown();
+        TestUtil.logout();
     }
 
     @Test
@@ -64,7 +66,7 @@ public class QuizServiceTest {
 
         quizService.addNew(user, quiz);
 
-        final List<Quiz> gameResults = quizRepository.findByUsername(AppUtil.getUsername(user));
+        final List<Quiz> gameResults = quizRepository.findByUsername(AppUtil.getUsername());
         TestUtil.assertEntities(1, gameResults);
         assertQuiz(gameResults.get(0), quiz);
     }
@@ -107,7 +109,7 @@ public class QuizServiceTest {
     }
 
     private void assertRating(Quiz quiz, int expectedUpVotes, int expectedDownVotes) {
-        quiz = quizRepository.getOne(quiz.getId());
+        quiz = quizRepository.findOne(quiz.getId());
         TestUtil.assertEntity(quiz);
         assertThat(quiz.getUpVotes(), is(expectedUpVotes));
         assertThat(quiz.getDownVotes(), is(expectedDownVotes));
