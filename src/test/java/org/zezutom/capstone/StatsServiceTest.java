@@ -17,7 +17,9 @@ import org.zezutom.capstone.service.StatsService;
 
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring-servlet.xml")
@@ -105,7 +107,6 @@ public class StatsServiceTest {
         assertTrue(userStatsWithAnUnchangedScore.getScore() == gameResult.getScore());
     }
 
-
     @Test
     public void getSingleGameHistory() {
         // Let's play to build up a bit of a gaming history
@@ -160,11 +161,18 @@ public class StatsServiceTest {
 
         // Like the quiz
         quizService.rate(user, quiz.getId(), true);
-        assertQuizRating(quizRatingRepository.findOneByQuizId(quiz.getId()), upVotes + 1, downVotes);
 
         // Dislike the quiz
         quizService.rate(user, quiz.getId(), false);
-        assertQuizRating(quizRatingRepository.findOneByQuizId(quiz.getId()), upVotes + 1, downVotes + 1);
+
+        // Verify that the quiz is on the list with correct rating counts
+        final List<QuizRating> ratings = statsService.getQuizRatings();
+        TestUtil.assertEntities(1, ratings);
+
+        final QuizRating rating = ratings.get(0);
+        TestUtil.assertEntity(rating);
+        assertThat(rating.getUpVotes(), is(upVotes + 1));
+        assertThat(rating.getDownVotes(), is(downVotes + 1));
     }
 
     private void assertQuizRating(QuizRating quizRating, int expectedUpVotes, int expectedDownVotes) {
