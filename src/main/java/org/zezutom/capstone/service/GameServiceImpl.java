@@ -25,7 +25,7 @@ import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
         clientIds = {Ids.WEB, Ids.ANDROID, API_EXPLORER_CLIENT_ID},
         audiences = {Ids.WEB, Ids.ANDROID},
         scopes = {Scopes.EMAIL, Scopes.PROFILE})
-public class GameServiceImpl implements GameService {
+public class GameServiceImpl extends GAEService implements GameService {
 
     @Autowired
     private GameResultRepository gameResultRepository;

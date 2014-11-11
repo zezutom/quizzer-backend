@@ -26,7 +26,7 @@ import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
         clientIds = {Ids.WEB, Ids.ANDROID, API_EXPLORER_CLIENT_ID},
         audiences = {Ids.WEB, Ids.ANDROID},
         scopes = {Scopes.EMAIL, Scopes.PROFILE})
-public class QuizServiceImpl implements QuizService {
+public class QuizServiceImpl extends GAEService implements QuizService {
 
     @Autowired
     private QuizRepository quizRepository;
@@ -35,6 +35,7 @@ public class QuizServiceImpl implements QuizService {
     private QuizRatingRepository quizRatingRepository;
 
     @Override
+    @ApiMethod(path = "quiz/get/all", httpMethod = ApiMethod.HttpMethod.GET)
     public List<Quiz> getAll() {
         return quizRepository.findAll();
     }
