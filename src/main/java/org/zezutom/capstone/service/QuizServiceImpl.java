@@ -3,6 +3,7 @@ package org.zezutom.capstone.service;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class QuizServiceImpl implements QuizService {
     @Transactional
     @Override
     @ApiMethod(path = "quiz/rate", httpMethod = ApiMethod.HttpMethod.POST)
-    public void rate(User user, String quizId, boolean liked) {
+    public void rate(User user, @Named("quizId") String quizId, @Named("liked") boolean liked) {
         Quiz quiz = quizRepository.findOne(AppUtil.sanitize(quizId));
         if (liked) quiz.upVote(); else quiz.downVote();
         quizRepository.save(quiz);

@@ -13,7 +13,7 @@ import java.util.Random;
  */
 public class AppUtil {
 
-    public static final String API_VERSION = "v1";
+    public static final String API_VERSION = "v2";
 
     public static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
 
