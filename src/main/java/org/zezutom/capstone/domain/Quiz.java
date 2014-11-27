@@ -27,12 +27,6 @@ import java.util.Date;
  *
  * difficulty   How difficult the game set is considered to be, scale 1 (easy) to 5 (tough)
  *
- * ratingCount  How many users have rated this game set. Every single up- and down-vote increments this count by one.
- *
- * upVotes      The total number of up-votes aka thumb-ups
- *
- * downVotes    The total number of down-votes aka thumb-downs
- *
  */
 @Entity
 public class Quiz extends GenericEntity {
@@ -52,12 +46,6 @@ public class Quiz extends GenericEntity {
     private String explanation;
 
     private int difficulty;
-
-    private int ratingCount;
-
-    private int upVotes;
-
-    private int downVotes;
 
     public Quiz() {}
 
@@ -125,30 +113,6 @@ public class Quiz extends GenericEntity {
         this.difficulty = difficulty;
     }
 
-    public int getRatingCount() {
-        return ratingCount;
-    }
-
-    public void setRatingCount(int ratingCount) {
-        this.ratingCount = ratingCount;
-    }
-
-    public int getUpVotes() {
-        return upVotes;
-    }
-
-    public int getDownVotes() {
-        return downVotes;
-    }
-
-    public void upVote() { upVotes++; incrementRatingCount(); }
-
-    public void downVote() { downVotes++; incrementRatingCount(); }
-
-    private void incrementRatingCount() {
-        this.ratingCount++;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -158,9 +122,6 @@ public class Quiz extends GenericEntity {
 
         if (answer != quiz.answer) return false;
         if (difficulty != quiz.difficulty) return false;
-        if (downVotes != quiz.downVotes) return false;
-        if (ratingCount != quiz.ratingCount) return false;
-        if (upVotes != quiz.upVotes) return false;
         if (explanation != null ? !explanation.equals(quiz.explanation) : quiz.explanation != null) return false;
         if (movieFour != null ? !movieFour.equals(quiz.movieFour) : quiz.movieFour != null) return false;
         if (movieOne != null ? !movieOne.equals(quiz.movieOne) : quiz.movieOne != null) return false;
@@ -181,9 +142,7 @@ public class Quiz extends GenericEntity {
         result = 31 * result + answer;
         result = 31 * result + (explanation != null ? explanation.hashCode() : 0);
         result = 31 * result + difficulty;
-        result = 31 * result + ratingCount;
-        result = 31 * result + upVotes;
-        result = 31 * result + downVotes;
+
         return result;
     }
 }

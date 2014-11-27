@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface GameResultRepository extends GenericEntityRepository<GameResult> {
 
-    List<GameResult> findByUsername(String username);
+    List<GameResult> findByUserId(String userId);
 }

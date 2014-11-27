@@ -1,10 +1,7 @@
 package org.zezutom.capstone.service;
 
 import com.google.appengine.api.users.User;
-import org.zezutom.capstone.domain.GameResult;
-import org.zezutom.capstone.domain.PlayoffResult;
-import org.zezutom.capstone.domain.QuizRating;
-import org.zezutom.capstone.domain.UserStats;
+import org.zezutom.capstone.domain.*;
 
 import java.util.List;
 
@@ -13,11 +10,25 @@ import java.util.List;
  */
 public interface StatsService {
 
-    UserStats getUserStats(User user);
+    GameResultStats getGameResultStats(User user);
 
-    List<GameResult> getSingleGameHistory(User user);
+    List<GameResult> getGameResults(User user);
 
-    List<PlayoffResult> getPlayoffHistory(User user);
+    List<PlayoffResult> getPlayoffResults(User user);
 
-    List<QuizRating> getQuizRatings();
+    /**
+     * List of individual quiz ratings
+     *
+     * @param quizId
+     * @return user ratings or an empty list if no one has rated the quiz so far
+     */
+    List<QuizRating> getQuizRatings(String quizId);
+
+    /**
+     * Rating summaries. Each and every quiz has a single summary.
+     * So this encompasses all quizzes in the system.
+     *
+     * @return
+     */
+    List<QuizRatingStats> getQuizRatingStats();
 }

@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.domain.*;
 import org.zezutom.capstone.service.GameService;
 import org.zezutom.capstone.service.QuizService;
@@ -17,9 +16,8 @@ import org.zezutom.capstone.service.StatsService;
 
 import java.util.List;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring-servlet.xml")
@@ -33,9 +31,6 @@ public class StatsServiceTest {
 
     @Autowired
     private QuizService quizService;
-
-    @Autowired
-    private QuizRatingRepository quizRatingRepository;
 
     private final LocalServiceTestHelper helper = TestUtil.getDatastoreTestHelper();
 
@@ -52,142 +47,119 @@ public class StatsServiceTest {
     }
 
     @Test
-    public void getUserStats_firstTime() {
+    public void getGameResultStats() {
+        User user = TestUtil.createUser();
+        GameResult coolResult = boostResult(3);
+        GameResult okayResult = boostResult(2);
+        GameResult poorResult = boostResult(1);
 
-        // Saving a new game should result into a new stats record
-        final User user = TestUtil.createUser();
-        final GameResult gameResult = TestUtil.createGameResult();
-        gameService.saveSingleGame(user, gameResult);
+        gameService.saveGameResult(user, coolResult);
+        gameService.saveGameResult(user, okayResult);
+        gameService.saveGameResult(user, poorResult);
 
-        // Verify that saved stats can be correctly retrieved
-        final UserStats userStats = statsService.getUserStats(user);
-        TestUtil.assertEntity(userStats);
-        assertUserStats(userStats, gameResult);
+        GameResultStats stats = statsService.getGameResultStats(user);
+        assertThat(stats.getPowerUps(), is(coolResult.getPowerUps()));
+        assertThat(stats.getRound(), is(coolResult.getRound()));
+        assertThat(stats.getRoundOneRatio(), is(coolResult.getRoundOneRatio()));
+        assertThat(stats.getRoundTwoRatio(), is(coolResult.getRoundTwoRatio()));
+        assertThat(stats.getRoundThreeRatio(), is(coolResult.getRoundThreeRatio()));
     }
 
     @Test
-    public void getUserStats_newRecord() {
-
-        // Save a new game
-        final User user = TestUtil.createUser();
-        final GameResult gameResult = TestUtil.createGameResult();
-        gameService.saveSingleGame(user, gameResult);
-
-        // Retrieve the stats
-        final UserStats userStats = statsService.getUserStats(user);
-
-        // Play another game and achieve a better score
-        final GameResult gameResultWithABetterScore = TestUtil.createGameResult();
-        gameResultWithABetterScore.setScore(gameResult.getScore() + 1);
-        gameService.saveSingleGame(user, gameResultWithABetterScore);
-
-        // Verify the stats were updated with the new score
-        final UserStats userStatsWithAnIncreasedScore = statsService.getUserStats(user);
-        assertTrue(userStatsWithAnIncreasedScore.getScore() == gameResultWithABetterScore.getScore());
-    }
-
-    @Test
-    public void getUserStats_noUpdate() {
-
-        // Save a new game
-        final User user = TestUtil.createUser();
-        final GameResult gameResult = TestUtil.createGameResult();
-        gameService.saveSingleGame(user, gameResult);
-
-        // Retrieve the stats
-        final UserStats userStats = statsService.getUserStats(user);
-
-        // Play another game and achieve a worse score than before
-        final GameResult gameResultWithAWorseScore = TestUtil.createGameResult();
-        gameResultWithAWorseScore.setScore(gameResult.getScore() - 1);
-        gameService.saveSingleGame(user, gameResultWithAWorseScore);
-
-        // Verify the stats retain the original values
-        final UserStats userStatsWithAnUnchangedScore = statsService.getUserStats(user);
-        assertTrue(userStatsWithAnUnchangedScore.getScore() == gameResult.getScore());
-    }
-
-    @Test
-    public void getSingleGameHistory() {
-        // Let's play to build up a bit of a gaming history
-        final User user = TestUtil.createUser();
-
+    public void getGameResults() {
         final int count = 10;
+        final User user = TestUtil.createUser();
 
-        for (int i = 0; i < count; i++)
-            gameService.saveSingleGame(user, TestUtil.createGameResult());
+        for (int i = 0; i < count; i++) {
+            gameService.saveGameResult(user, TestUtil.createGameResult());
+        }
 
-        // Verify that all of the saved results can be correctly retrieved
-        final List<GameResult> gameResults = statsService.getSingleGameHistory(user);
+        List<GameResult> gameResults = statsService.getGameResults(user);
         TestUtil.assertEntities(count, gameResults);
-        final GameResult expected = TestUtil.createGameResult();
-        for (GameResult gameResult : gameResults)
-            TestUtil.assertGameResult(gameResult, expected);
+
+        for (GameResult gameResult : gameResults) {
+            assertEquals(TestUtil.createGameResult(), gameResult);
+        }
     }
 
     @Test
-    public void getPlayoffHistory() {
-
-        // Let's challenge a friend a few times to come up with a playoff result list
-        final User user = TestUtil.createUser();
-
+    public void getPlayoffResults() {
         final int count = 10;
+        final User user = TestUtil.createUser();
+        final String opponentId = "Myself";
 
-        final String opponent = "test";
+        for (int i = 0; i < count; i++) {
+            gameService.savePlayoffResult(user, TestUtil.createPlayoffResult(opponentId));
+        }
 
-        for (int i = 0; i < count; i++)
-            gameService.savePlayoff(user, TestUtil.createPlayoffResult(opponent));
+        List<PlayoffResult> playOffResults = statsService.getPlayoffResults(user);
+        TestUtil.assertEntities(count, playOffResults);
 
-        // Verify that all of the saved results can be correctly retrieved
-        final List<PlayoffResult> playoffResults = statsService.getPlayoffHistory(user);
-        TestUtil.assertEntities(count, playoffResults);
-        final PlayoffResult expected = TestUtil.createPlayoffResult(opponent);
-        for (PlayoffResult playoffResult : playoffResults)
-            TestUtil.assertPlayOffResult(playoffResult, expected);
-
+        for (PlayoffResult playOffResult : playOffResults) {
+            assertEquals(TestUtil.createPlayoffResult(opponentId), playOffResult);
+        }
     }
 
     @Test
     public void getQuizRatings() {
-
-        // Create a new quiz
+        final int count = 10;
         final User user = TestUtil.createUser();
-        final Quiz quiz = TestUtil.createQuiz();
-        quizService.addNew(user, quiz);
 
-        // Capture initial counts
-        final int upVotes = quiz.getUpVotes();
-        final int downVotes = quiz.getDownVotes();
+        quizService.addNew(user, TestUtil.createQuiz());
+        Quiz quiz = quizService.getAll().get(0);
 
-        // Like the quiz
-        quizService.rate(user, quiz.getId(), true);
+        for (int i = 0; i < count; i++) {
+            quizService.rate(user, quiz.getId(), i % 2 == 0);
+        }
 
-        // Dislike the quiz
-        quizService.rate(user, quiz.getId(), false);
+        List<QuizRating> quizRatings = statsService.getQuizRatings(quiz.getId());
+        TestUtil.assertEntities(count, quizRatings);
 
-        // Verify that the quiz is on the list with correct rating counts
-        final List<QuizRating> ratings = statsService.getQuizRatings();
-        TestUtil.assertEntities(1, ratings);
-
-        final QuizRating rating = ratings.get(0);
-        TestUtil.assertEntity(rating);
-        assertThat(rating.getUpVotes(), is(upVotes + 1));
-        assertThat(rating.getDownVotes(), is(downVotes + 1));
+        int likes = 0, dislikes = 0;
+        for (QuizRating quizRating : quizRatings) {
+            if (quizRating.isLiked()) likes++; else dislikes++;
+        }
+        assertTrue(likes == dislikes);
+        assertThat(likes + dislikes, is(count));
     }
 
-    private void assertQuizRating(QuizRating quizRating, int expectedUpVotes, int expectedDownVotes) {
-        TestUtil.assertEntity(quizRating);
-        assertTrue(quizRating.getRatingCount() == expectedUpVotes + expectedDownVotes);
-        assertTrue(quizRating.getUpVotes() == expectedUpVotes);
-        assertTrue(quizRating.getDownVotes() == expectedDownVotes);
+    @Test
+    public void getQuizRatingStats() {
+        final int count = 10;
+        final User user = TestUtil.createUser();
+
+        quizService.addNew(user, TestUtil.createQuiz());
+        Quiz quiz = quizService.getAll().get(0);
+
+        int likes = 0, dislikes = 0;
+        for (int i = 0; i < count; i++) {
+            boolean liked = i % 2 == 0;
+            if (liked) likes++; else dislikes++;
+            quizService.rate(user, quiz.getId(), liked);
+        }
+
+        List<QuizRatingStats> statsList = statsService.getQuizRatingStats();
+        assertNotNull(statsList);
+        assertThat(statsList.size(), is(1));
+
+        QuizRatingStats stats = statsList.get(0);
+        assertThat(stats.getQuizId(), is(quiz.getId()));
+        assertThat(stats.getTitle(), is(quiz.getTitle()));
+        assertThat(stats.getRatingCount(), is(count));
+        assertThat(stats.getDownVotes(), is(likes));
+        assertThat(stats.getUpVotes(), is(dislikes));
     }
 
-    private void assertUserStats(UserStats actual, GameResult expected) {
-        assertTrue(actual.getPowerUps() == expected.getPowerUps());
-        assertTrue(actual.getRound() == expected.getRound());
-        assertTrue(actual.getRoundOneRatio() == expected.getRoundOneRatio());
-        assertTrue(actual.getRoundTwoRatio() == expected.getRoundTwoRatio());
-        assertTrue(actual.getRoundThreeRatio() == expected.getRoundThreeRatio());
-        assertTrue(actual.getScore() == expected.getScore());
+    private GameResult boostResult(int multiplicator) {
+        GameResult result = TestUtil.createGameResult();
+        result.setPowerUps(result.getPowerUps() * multiplicator);
+        result.setRound(result.getRound() * multiplicator);
+        result.setRoundOneRatio(result.getRoundOneRatio() * multiplicator);
+        result.setRoundTwoRatio(result.getRoundTwoRatio() * multiplicator);
+        result.setRoundThreeRatio(result.getRoundThreeRatio() * multiplicator);
+        result.setScore(result.getScore() * multiplicator);
+
+        return result;
     }
+
 }

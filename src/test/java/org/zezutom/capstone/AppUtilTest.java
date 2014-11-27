@@ -32,7 +32,7 @@ public class AppUtilTest {
     @Test
     public void getUsername() {
         final User user = TestUtil.createUser();
-        assertThat(AppUtil.getUsername(), is(user.getEmail()));
+        assertThat(AppUtil.getUserId(), is(user.getEmail()));
     }
 
     @Test

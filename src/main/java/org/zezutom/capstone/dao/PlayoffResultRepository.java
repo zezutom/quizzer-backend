@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface PlayoffResultRepository extends GenericEntityRepository<PlayoffResult> {
 
-    List<PlayoffResult> findByUsername(String username);
+    List<PlayoffResult> findByUserId(String userId);
 }

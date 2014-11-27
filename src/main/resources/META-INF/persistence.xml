@@ -11,7 +11,6 @@
         <class>org.zezutom.capstone.domain.PlayoffResult</class>
         <class>org.zezutom.capstone.domain.Quiz</class>
         <class>org.zezutom.capstone.domain.QuizRating</class>
-        <class>org.zezutom.capstone.domain.UserStats</class>
         <exclude-unlisted-classes />
         <properties>
             <property name="datanucleus.ConnectionURL" value="appengine"/>

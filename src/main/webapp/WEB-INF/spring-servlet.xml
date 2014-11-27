@@ -12,7 +12,9 @@
 
     <context:component-scan base-package="org.zezutom.capstone.service" />
 
-    <jpa:repositories base-package="org.zezutom.capstone.dao" />
+    <jpa:repositories base-package="org.zezutom.capstone.dao"
+                      transaction-manager-ref="transactionManager"
+                      entity-manager-factory-ref="entityManagerFactory"/>
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 

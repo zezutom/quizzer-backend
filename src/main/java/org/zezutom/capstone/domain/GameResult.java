@@ -9,17 +9,17 @@ import javax.persistence.Entity;
  *
  * timestamp        When and what time was the game completed
  *
- * round            The furthest round the user made it to in that particular game
+ * round            The round the user made it to in that particular game
  *
  * score            The achieved score
  *
- * powerUps         The highest number of power-ups the user has ever earned during a single game
+ * powerUps         The number of power-ups the user has earned during a single game
  *
- * roundOneRatio    The highest 1st-attempt success ratio the user has ever achieved during a single game
+ * roundOneRatio    The 1st-attempt success ratio the user has achieved during a single game
  *
- * roundTwoRatio    The highest 2st-attempt success ratio the user has ever achieved during a single game
+ * roundTwoRatio    The 2st-attempt success ratio the user has achieved during a single game
  *
- * roundThreeRatio  The highest 3rd-attempt success ratio the user has ever achieved during a single game
+ * roundThreeRatio  The 3rd-attempt success ratio the user has achieved during a single game
  *
  */
 @Entity

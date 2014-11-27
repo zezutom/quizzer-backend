@@ -9,8 +9,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.dao.QuizRepository;
 import org.zezutom.capstone.domain.Quiz;
+import org.zezutom.capstone.domain.QuizRating;
 import org.zezutom.capstone.service.QuizService;
 import org.zezutom.capstone.util.AppUtil;
 
@@ -29,6 +31,9 @@ public class QuizServiceTest {
 
     @Autowired
     private QuizRepository quizRepository;
+
+    @Autowired
+    private QuizRatingRepository quizRatingRepository;
 
     private final LocalServiceTestHelper helper = TestUtil.getDatastoreTestHelper();
 
@@ -66,7 +71,7 @@ public class QuizServiceTest {
 
         quizService.addNew(user, quiz);
 
-        final List<Quiz> gameResults = quizRepository.findByUsername(AppUtil.getUsername());
+        final List<Quiz> gameResults = quizRepository.findByUserId(AppUtil.getUserId());
         TestUtil.assertEntities(1, gameResults);
         assertQuiz(gameResults.get(0), quiz);
     }
@@ -76,15 +81,11 @@ public class QuizServiceTest {
         // Save a new quiz
         final Quiz quiz = saveAndGetQuiz();
 
-        // Take the existing ratings
-        final int upVotes = quiz.getUpVotes();
-        final int downVotes = quiz.getDownVotes();
-
         // Let a user like it
         quizService.rate(TestUtil.createUser(), quiz.getId(), true);
 
         // Verify it's got up-voted
-        assertRating(quiz, upVotes + 1, downVotes);
+        assertRating(quiz.getId(), true);
     }
 
     @Test
@@ -92,15 +93,11 @@ public class QuizServiceTest {
         // Save a new quiz
         final Quiz quiz = saveAndGetQuiz();
 
-        // Take the existing ratings
-        final int upVotes = quiz.getUpVotes();
-        final int downVotes = quiz.getDownVotes();
-
         // Let a user dislike it
         quizService.rate(TestUtil.createUser(), quiz.getId(), false);
 
         // Verify it's got down-voted
-        assertRating(quiz, upVotes, downVotes + 1);
+        assertRating(quiz.getId(), false);
     }
 
     private Quiz saveAndGetQuiz() {
@@ -108,11 +105,14 @@ public class QuizServiceTest {
         return quizRepository.findAll().get(0);
     }
 
-    private void assertRating(Quiz quiz, int expectedUpVotes, int expectedDownVotes) {
-        quiz = quizRepository.findOne(quiz.getId());
-        TestUtil.assertEntity(quiz);
-        assertThat(quiz.getUpVotes(), is(expectedUpVotes));
-        assertThat(quiz.getDownVotes(), is(expectedDownVotes));
+    private void assertRating(String quizId, boolean liked) {
+        List<QuizRating> quizRatings = quizRatingRepository.findByQuizId(quizId);
+        assertThat(quizRatings.size(), is(1));
+
+        QuizRating quizRating = quizRatings.get(0);
+        TestUtil.assertEntity(quizRating);
+
+        assertThat(quizRating.isLiked(), is(liked));
     }
 
     private void assertQuiz(Quiz actual, Quiz expected) {
@@ -123,9 +123,6 @@ public class QuizServiceTest {
         assertThat(actual.getMovieThree(), is(expected.getMovieThree()));
         assertThat(actual.getMovieFour(), is(expected.getMovieFour()));
         assertThat(actual.getTitle(), is(expected.getTitle()));
-        assertThat(actual.getRatingCount(), is(expected.getRatingCount()));
-        assertThat(actual.getUpVotes(), is(expected.getUpVotes()));
-        assertThat(actual.getDownVotes(), is(expected.getDownVotes()));
     }
 
 }

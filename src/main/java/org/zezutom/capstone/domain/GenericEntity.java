@@ -21,7 +21,7 @@ public abstract class GenericEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    private String username;
+    private String userId;
 
     public String getId() {
         return id;
@@ -39,19 +39,19 @@ public abstract class GenericEntity implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(String username) {
+        this.userId = username;
     }
 
 
     @PrePersist
     public void audit() {
         setCreatedAt(new Date());
-        setUsername(AppUtil.getUsername());
+        setUserId(AppUtil.getUserId());
     }
 
 }

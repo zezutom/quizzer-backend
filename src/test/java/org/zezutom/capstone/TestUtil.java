@@ -33,9 +33,9 @@ public class TestUtil {
         return gameResult;
     }
 
-    public static PlayoffResult createPlayoffResult(String opponent) {
+    public static PlayoffResult createPlayoffResult(String opponentId) {
         PlayoffResult playoffResult = new PlayoffResult();
-        playoffResult.setOpponent(opponent);
+        playoffResult.setOpponentId(opponentId);
         playoffResult.setRound(10);
         playoffResult.setWin(true);
         return playoffResult;
@@ -53,9 +53,9 @@ public class TestUtil {
         return quiz;
     }
 
-    public static UserStats createUserStats(User user) {
-        UserStats userStats = new UserStats();
-        userStats.setUsername(user.getUserId());
+    public static GameResultStats createUserStats(User user) {
+        GameResultStats userStats = new GameResultStats();
+        userStats.setUserId(user.getUserId());
         userStats.setPowerUps(10);
         userStats.setRound(10);
         userStats.setRoundOneRatio(25);
@@ -78,7 +78,7 @@ public class TestUtil {
         assertNotNull(entity.getId());
         assertNotNull(entity.getVersion());
         assertNotNull(entity.getCreatedAt());
-        assertNotNull(entity.getUsername());
+        assertNotNull(entity.getUserId());
     }
 
     public static void assertGameResult(GameResult actual, GameResult expected) {
@@ -91,7 +91,7 @@ public class TestUtil {
     }
 
     public static void assertPlayOffResult(PlayoffResult actual, PlayoffResult expected) {
-        assertThat(actual.getOpponent(), is(expected.getOpponent()));
+        assertThat(actual.getOpponentId(), is(expected.getOpponentId()));
         assertTrue(actual.getRound() == expected.getRound());
     }
 

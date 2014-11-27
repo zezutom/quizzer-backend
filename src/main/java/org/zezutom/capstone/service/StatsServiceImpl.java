@@ -9,16 +9,13 @@ import org.springframework.stereotype.Service;
 import org.zezutom.capstone.dao.GameResultRepository;
 import org.zezutom.capstone.dao.PlayoffResultRepository;
 import org.zezutom.capstone.dao.QuizRatingRepository;
-import org.zezutom.capstone.dao.UserStatsRepository;
-import org.zezutom.capstone.domain.GameResult;
-import org.zezutom.capstone.domain.PlayoffResult;
-import org.zezutom.capstone.domain.QuizRating;
-import org.zezutom.capstone.domain.UserStats;
+import org.zezutom.capstone.dao.QuizRepository;
+import org.zezutom.capstone.domain.*;
 import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;
 
-import java.util.List;
+import java.util.*;
 
 import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
 
@@ -30,8 +27,6 @@ import static com.google.api.server.spi.Constant.API_EXPLORER_CLIENT_ID;
         scopes = {Scopes.EMAIL, Scopes.PROFILE})
 public class StatsServiceImpl extends GAEService implements StatsService {
 
-    @Autowired
-    private UserStatsRepository userStatsRepository;
 
     @Autowired
     private GameResultRepository gameResultRepository;
@@ -42,27 +37,83 @@ public class StatsServiceImpl extends GAEService implements StatsService {
     @Autowired
     private QuizRatingRepository quizRatingRepository;
 
+    @Autowired
+    private QuizRepository quizRepository;
+
     @Override
-    @ApiMethod(path = "userstats/get", httpMethod = ApiMethod.HttpMethod.GET)
-    public UserStats getUserStats(User user) {
-        return userStatsRepository.findByUsername(AppUtil.getUsername());
+    @ApiMethod(path = "game/result/stats/get", httpMethod = ApiMethod.HttpMethod.GET)
+    public GameResultStats getGameResultStats(User user) {
+        int score, round, powerUps, roundOneRatio, roundTwoRatio, roundThreeRatio;
+        score = round = powerUps = roundOneRatio = roundTwoRatio = roundThreeRatio = 0;
+
+        for (GameResult gameResult : getGameResults(user)) {
+            if (gameResult.getScore() > score) score = gameResult.getScore();
+            if (gameResult.getRound() > round) round = gameResult.getRound();
+            if (gameResult.getPowerUps() > powerUps) powerUps = gameResult.getPowerUps();
+            if (gameResult.getRoundOneRatio() > roundOneRatio) roundOneRatio = gameResult.getRoundOneRatio();
+            if (gameResult.getRoundTwoRatio() > roundTwoRatio) roundTwoRatio = gameResult.getRoundTwoRatio();
+            if (gameResult.getRoundThreeRatio() > roundThreeRatio) roundThreeRatio = gameResult.getRoundThreeRatio();
+        }
+
+        GameResultStats stats = new GameResultStats();
+        stats.setScore(score);                      // the best score ever
+        stats.setRound(round);                      // the furthest round
+        stats.setPowerUps(powerUps);                // the highest number of accumulated power-ups
+        stats.setRoundOneRatio(roundOneRatio);      // the highest percentage of 1st-time attempts
+        stats.setRoundTwoRatio(roundTwoRatio);      // the highest percentage of 2nd-time attempts
+        stats.setRoundThreeRatio(roundThreeRatio);  // the highest percentage of 3rd-time attempts
+
+        return stats;
     }
 
     @Override
-    @ApiMethod(path = "singlegame/history", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<GameResult> getSingleGameHistory(User user) {
-        return gameResultRepository.findByUsername(AppUtil.getUsername());
+    @ApiMethod(path = "game/result/list", httpMethod = ApiMethod.HttpMethod.GET)
+    public List<GameResult> getGameResults(User user) {
+        return gameResultRepository.findByUserId(AppUtil.getUserId());
     }
 
     @Override
-    @ApiMethod(path = "playoff/history", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<PlayoffResult> getPlayoffHistory(User user) {
-        return playoffResultRepository.findByUsername(AppUtil.getUsername());
+    @ApiMethod(path = "playoff/list", httpMethod = ApiMethod.HttpMethod.GET)
+    public List<PlayoffResult> getPlayoffResults(User user) {
+        return playoffResultRepository.findByUserId(AppUtil.getUserId());
     }
 
     @Override
-    @ApiMethod(path = "quizrating/list", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<QuizRating> getQuizRatings() {
-        return quizRatingRepository.findAll();
+    @ApiMethod(path = "quiz/rating/list", httpMethod = ApiMethod.HttpMethod.GET)
+    public List<QuizRating> getQuizRatings(String quizId) {
+        return quizRatingRepository.findByQuizId(quizId);
+    }
+
+    @Override
+    public List<QuizRatingStats> getQuizRatingStats() {
+        Map<String, QuizRatingStats> statsMap = new HashMap<>();
+
+        for (QuizRating quizRating : quizRatingRepository.findAll()) {
+            String quizId = quizRating.getQuizId();
+            QuizRatingStats stats = statsMap.get(quizId);
+
+            if (stats == null) {
+                Quiz quiz = quizRepository.findOne(quizId);
+                stats = new QuizRatingStats();
+                stats.setQuizId(quizId);
+                stats.setTitle(quiz.getTitle());
+                stats.setRatingCount(1);
+                stats.setDownVotes(quizRating.isLiked() ? 0 : 1);
+                stats.setUpVotes(quizRating.isLiked() ? 1 : 0);
+                statsMap.put(quizId, stats);
+            } else {
+                stats.setRatingCount(stats.getRatingCount() + 1);
+                if (quizRating.isLiked()) {
+                    stats.setUpVotes(stats.getUpVotes() + 1);
+                } else {
+                    stats.setDownVotes(stats.getDownVotes() + 1);
+                }
+            }
+        }
+
+        ArrayList<QuizRatingStats> statsList = new ArrayList<>(statsMap.values());
+        Collections.sort(statsList, new QuizRatingStatsComparator());
+
+        return statsList;
     }
 }

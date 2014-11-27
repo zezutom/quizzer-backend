@@ -1,9 +1,9 @@
 package org.zezutom.capstone.domain;
 
-import javax.persistence.Entity;
-
 /**
  * User statistics - keeps a track of the very best achievements of a particular user.
+ *
+ * Please note, this is not an entity.
  *
  * username         Identifies the user
  *
@@ -20,8 +20,7 @@ import javax.persistence.Entity;
  * roundThreeRatio  The highest 3rd-attempt success ratio the user has ever achieved during a single game
  *
  */
-@Entity
-public class UserStats extends GenericEntity {
+public class GameResultStats extends GenericEntity {
 
     private int score;
 
@@ -86,9 +85,9 @@ public class UserStats extends GenericEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UserStats)) return false;
+        if (!(o instanceof GameResultStats)) return false;
 
-        UserStats userStats = (UserStats) o;
+        GameResultStats userStats = (GameResultStats) o;
 
         if (powerUps != userStats.powerUps) return false;
         if (round != userStats.round) return false;

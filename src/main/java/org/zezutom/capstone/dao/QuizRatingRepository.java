@@ -3,7 +3,9 @@ package org.zezutom.capstone.dao;
 
 import org.zezutom.capstone.domain.QuizRating;
 
+import java.util.List;
+
 public interface QuizRatingRepository extends GenericEntityRepository<QuizRating> {
 
-    QuizRating findOneByQuizId(String quizId);
+    List<QuizRating> findByQuizId(String quizId);
 }

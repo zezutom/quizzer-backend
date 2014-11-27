@@ -27,7 +27,7 @@ public class AppUtil {
         return Jsoup.clean(input, Whitelist.basic());
     }
 
-    public static String getUsername() {
+    public static String getUserId() {
         Authentication a = SecurityContextHolder.getContext().getAuthentication();
         return a == null ? null : ((OAuth2Authentication) a).getOAuth2Request().getClientId();
     }

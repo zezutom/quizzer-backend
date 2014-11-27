@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface QuizRepository extends GenericEntityRepository<Quiz> {
 
-    List<Quiz> findByUsername(String username);
+    List<Quiz> findByUserId(String userId);
 }

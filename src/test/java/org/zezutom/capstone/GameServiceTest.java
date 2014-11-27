@@ -46,28 +46,28 @@ public class GameServiceTest {
     }
 
     @Test
-    public void saveSingleGame() {
+    public void saveGameResult() {
         // Save a result of a single game
         final User user = TestUtil.createUser();
         final GameResult gameResult = TestUtil.createGameResult();
-        gameService.saveSingleGame(user, gameResult);
+        gameService.saveGameResult(user, gameResult);
 
         // Verify the result has been correctly saved and is associated with the expected user
-        final List<GameResult> gameResults = gameResultRepository.findByUsername(AppUtil.getUsername());
+        final List<GameResult> gameResults = gameResultRepository.findByUserId(AppUtil.getUserId());
         TestUtil.assertEntities(1, gameResults);
         TestUtil.assertGameResult(gameResults.get(0), gameResult);
     }
 
     @Test
-    public void savePlayoff() {
+    public void savePlayoffResult() {
         // Save a result of a play-off match
         final User user = TestUtil.createUser();
         final String opponent = "Test Opponent";
         final PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponent);
-        gameService.savePlayoff(user, playoffResult);
+        gameService.savePlayoffResult(user, playoffResult);
 
         // Verify the result has been correctly saved and is associated with the expected user
-        final List<PlayoffResult> playoffResults = playoffResultRepository.findByUsername(AppUtil.getUsername());
+        final List<PlayoffResult> playoffResults = playoffResultRepository.findByUserId(AppUtil.getUserId());
         TestUtil.assertEntities(1, playoffResults);
         TestUtil.assertPlayOffResult(playoffResults.get(0), playoffResult);
     }
