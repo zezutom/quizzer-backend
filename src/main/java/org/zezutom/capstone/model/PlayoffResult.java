@@ -1,4 +1,4 @@
-package org.zezutom.capstone.domain;
+package org.zezutom.capstone.model;
 
 import javax.persistence.*;
 

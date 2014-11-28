@@ -1,4 +1,4 @@
-package org.zezutom.capstone.domain;
+package org.zezutom.capstone.model;
 
 /**
  * Rating statistics of an individual quiz.

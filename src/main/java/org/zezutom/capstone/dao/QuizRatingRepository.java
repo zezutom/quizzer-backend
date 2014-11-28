@@ -1,7 +1,7 @@
 package org.zezutom.capstone.dao;
 
 
-import org.zezutom.capstone.domain.QuizRating;
+import org.zezutom.capstone.model.QuizRating;
 
 import java.util.List;
 

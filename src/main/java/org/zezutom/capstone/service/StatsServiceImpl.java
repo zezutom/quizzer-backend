@@ -11,7 +11,7 @@ import org.zezutom.capstone.dao.GameResultRepository;
 import org.zezutom.capstone.dao.PlayoffResultRepository;
 import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.dao.QuizRepository;
-import org.zezutom.capstone.domain.*;
+import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;

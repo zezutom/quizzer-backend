@@ -7,7 +7,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
-import org.zezutom.capstone.domain.*;
+import org.zezutom.capstone.model.*;
 
 import java.util.List;
 

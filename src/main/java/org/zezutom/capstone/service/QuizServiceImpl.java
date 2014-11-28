@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.dao.QuizRepository;
-import org.zezutom.capstone.domain.Quiz;
-import org.zezutom.capstone.domain.QuizRating;
+import org.zezutom.capstone.model.Quiz;
+import org.zezutom.capstone.model.QuizRating;
 import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;
@@ -43,16 +43,16 @@ public class QuizServiceImpl extends GAEService implements QuizService {
 
     @Override
     @ApiMethod(path = "quiz/add", httpMethod = ApiMethod.HttpMethod.POST)
-    public void addNew(User user, Quiz quiz) {
-        quizRepository.save(quiz);
+    public Quiz addNew(User user, Quiz quiz) {
+        return quizRepository.save(quiz);
     }
 
     @Override
     @ApiMethod(path = "quiz/rate", httpMethod = ApiMethod.HttpMethod.POST)
-    public void rate(User user, @Named("quizId") String quizId, @Named("liked") boolean liked) {
+    public QuizRating rate(User user, @Named("quizId") String quizId, @Named("liked") boolean liked) {
         QuizRating rating = new QuizRating();
         rating.setQuizId(quizId);
         rating.setLiked(liked);
-        quizRatingRepository.save(rating);
+        return quizRatingRepository.save(rating);
     }
 }

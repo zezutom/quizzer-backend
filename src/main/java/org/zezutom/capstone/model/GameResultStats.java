@@ -1,4 +1,4 @@
-package org.zezutom.capstone.domain;
+package org.zezutom.capstone.model;
 
 /**
  * User statistics - keeps a track of the very best achievements of a particular user.

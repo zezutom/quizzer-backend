@@ -11,12 +11,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.dao.QuizRepository;
-import org.zezutom.capstone.domain.Quiz;
-import org.zezutom.capstone.domain.QuizRating;
+import org.zezutom.capstone.model.Quiz;
+import org.zezutom.capstone.model.QuizRating;
 import org.zezutom.capstone.service.QuizService;
-import org.zezutom.capstone.util.AppUtil;
-
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -56,8 +53,10 @@ public class QuizServiceTest {
         final User user = TestUtil.createUser();
         final int count = 10;
 
-        for (int i = 0; i < count; i++)
-            quizService.addNew(user, TestUtil.createQuiz());
+        for (int i = 0; i < count; i++) {
+            Quiz quiz = TestUtil.createQuiz();
+            assertThat(quizService.addNew(user, quiz), is(quiz));
+        }
 
         // Verify that all of the saved quizzes can be correctly retrieved
         TestUtil.assertEntities(count, quizService.getAll());
@@ -65,39 +64,33 @@ public class QuizServiceTest {
 
     @Test
     public void addNew() {
-
-        final User user = TestUtil.createUser();
-        final Quiz quiz = TestUtil.createQuiz();
-
-        quizService.addNew(user, quiz);
-
-        final List<Quiz> gameResults = quizRepository.findByUserId(AppUtil.getUserId());
-        TestUtil.assertEntities(1, gameResults);
-        assertQuiz(gameResults.get(0), quiz);
+        User user = TestUtil.createUser();
+        Quiz quiz = TestUtil.createQuiz();
+        assertQuiz(quizService.addNew(user, quiz), quiz);
     }
 
     @Test
     public void rate_like() {
         // Save a new quiz
-        final Quiz quiz = saveAndGetQuiz();
+        Quiz quiz = saveAndGetQuiz();
 
         // Let a user like it
-        quizService.rate(TestUtil.createUser(), quiz.getId(), true);
+        QuizRating quizRating = quizService.rate(TestUtil.createUser(), quiz.getId(), true);
 
         // Verify it's got up-voted
-        assertRating(quiz.getId(), true);
+        assertRating(quizRating, true);
     }
 
     @Test
     public void rate_dislike() {
         // Save a new quiz
-        final Quiz quiz = saveAndGetQuiz();
+        Quiz quiz = saveAndGetQuiz();
 
         // Let a user dislike it
-        quizService.rate(TestUtil.createUser(), quiz.getId(), false);
+        QuizRating quizRating = quizService.rate(TestUtil.createUser(), quiz.getId(), false);
 
         // Verify it's got down-voted
-        assertRating(quiz.getId(), false);
+        assertRating(quizRating, false);
     }
 
     private Quiz saveAndGetQuiz() {
@@ -105,13 +98,8 @@ public class QuizServiceTest {
         return quizRepository.findAll().get(0);
     }
 
-    private void assertRating(String quizId, boolean liked) {
-        List<QuizRating> quizRatings = quizRatingRepository.findByQuizId(quizId);
-        assertThat(quizRatings.size(), is(1));
-
-        QuizRating quizRating = quizRatings.get(0);
+    private void assertRating(QuizRating quizRating, boolean liked) {
         TestUtil.assertEntity(quizRating);
-
         assertThat(quizRating.isLiked(), is(liked));
     }
 

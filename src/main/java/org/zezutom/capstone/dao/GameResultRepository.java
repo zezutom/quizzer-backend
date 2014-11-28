@@ -1,6 +1,6 @@
 package org.zezutom.capstone.dao;
 
-import org.zezutom.capstone.domain.GameResult;
+import org.zezutom.capstone.model.GameResult;
 
 import java.util.List;
 

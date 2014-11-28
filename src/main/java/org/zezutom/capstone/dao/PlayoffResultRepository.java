@@ -1,6 +1,6 @@
 package org.zezutom.capstone.dao;
 
-import org.zezutom.capstone.domain.PlayoffResult;
+import org.zezutom.capstone.model.PlayoffResult;
 
 import java.util.List;
 

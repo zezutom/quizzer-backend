@@ -1,4 +1,4 @@
-package org.zezutom.capstone.domain;
+package org.zezutom.capstone.model;
 
 import org.datanucleus.api.jpa.annotations.Extension;
 import org.zezutom.capstone.util.AppUtil;

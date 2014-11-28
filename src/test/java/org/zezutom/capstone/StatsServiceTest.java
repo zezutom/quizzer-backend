@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.zezutom.capstone.domain.*;
+import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.service.GameService;
 import org.zezutom.capstone.service.QuizService;
 import org.zezutom.capstone.service.StatsService;
@@ -71,15 +71,12 @@ public class StatsServiceTest {
         final User user = TestUtil.createUser();
 
         for (int i = 0; i < count; i++) {
-            gameService.saveGameResult(user, TestUtil.createGameResult());
+            GameResult gameResult = TestUtil.createGameResult();
+            assertThat(gameService.saveGameResult(user, gameResult), is(gameResult));
         }
 
         List<GameResult> gameResults = statsService.getGameResults(user);
         TestUtil.assertEntities(count, gameResults);
-
-        for (GameResult gameResult : gameResults) {
-            assertEquals(TestUtil.createGameResult(), gameResult);
-        }
     }
 
     @Test
@@ -89,15 +86,12 @@ public class StatsServiceTest {
         final String opponentId = "Myself";
 
         for (int i = 0; i < count; i++) {
-            gameService.savePlayoffResult(user, TestUtil.createPlayoffResult(opponentId));
+            PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponentId);
+            assertThat(gameService.savePlayoffResult(user, playoffResult), is(playoffResult));
         }
 
         List<PlayoffResult> playOffResults = statsService.getPlayoffResults(user);
         TestUtil.assertEntities(count, playOffResults);
-
-        for (PlayoffResult playOffResult : playOffResults) {
-            assertEquals(TestUtil.createPlayoffResult(opponentId), playOffResult);
-        }
     }
 
     @Test
@@ -109,7 +103,7 @@ public class StatsServiceTest {
         Quiz quiz = quizService.getAll().get(0);
 
         for (int i = 0; i < count; i++) {
-            quizService.rate(user, quiz.getId(), i % 2 == 0);
+            assertNotNull(quizService.rate(user, quiz.getId(), i % 2 == 0));
         }
 
         List<QuizRating> quizRatings = statsService.getQuizRatings(quiz.getId());
@@ -128,14 +122,13 @@ public class StatsServiceTest {
         final int count = 10;
         final User user = TestUtil.createUser();
 
-        quizService.addNew(user, TestUtil.createQuiz());
-        Quiz quiz = quizService.getAll().get(0);
+        Quiz quiz = quizService.addNew(user, TestUtil.createQuiz());
 
         int likes = 0, dislikes = 0;
         for (int i = 0; i < count; i++) {
             boolean liked = i % 2 == 0;
             if (liked) likes++; else dislikes++;
-            quizService.rate(user, quiz.getId(), liked);
+            assertNotNull(quizService.rate(user, quiz.getId(), liked));
         }
 
         List<QuizRatingStats> statsList = statsService.getQuizRatingStats();

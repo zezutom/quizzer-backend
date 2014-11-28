@@ -1,9 +1,6 @@
-package org.zezutom.capstone.domain;
-
-import org.datanucleus.api.jpa.annotations.Extension;
+package org.zezutom.capstone.model;
 
 import javax.persistence.*;
-import java.util.Date;
 
 /**
  * A quiz comprises four different movie titles, one of which being the odd one.

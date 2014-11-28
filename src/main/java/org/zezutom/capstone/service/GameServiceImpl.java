@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zezutom.capstone.dao.GameResultRepository;
 import org.zezutom.capstone.dao.PlayoffResultRepository;
-import org.zezutom.capstone.domain.GameResult;
-import org.zezutom.capstone.domain.PlayoffResult;
+import org.zezutom.capstone.model.GameResult;
+import org.zezutom.capstone.model.PlayoffResult;
 import org.zezutom.capstone.util.AppUtil;
 import org.zezutom.capstone.util.Ids;
 import org.zezutom.capstone.util.Scopes;
@@ -34,14 +34,14 @@ public class GameServiceImpl extends GAEService implements GameService {
 
     @Override
     @ApiMethod(path = "singlegame/save", httpMethod = ApiMethod.HttpMethod.POST)
-    public void saveGameResult(User user, GameResult gameResult) {
-        gameResultRepository.save(gameResult);
+    public GameResult saveGameResult(User user, GameResult gameResult) {
+        return gameResultRepository.save(gameResult);
     }
 
     @Transactional
     @Override
     @ApiMethod(path = "playoff/save", httpMethod = ApiMethod.HttpMethod.POST)
-    public void savePlayoffResult(User user, PlayoffResult playoffResult) {
-        playoffResultRepository.save(playoffResult);
+    public PlayoffResult savePlayoffResult(User user, PlayoffResult playoffResult) {
+        return playoffResultRepository.save(playoffResult);
     }
 }

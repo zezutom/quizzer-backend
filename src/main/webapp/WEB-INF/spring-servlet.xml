@@ -24,7 +24,7 @@
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="persistenceUnitName" value="jpa.unit" />
-        <property name="packagesToScan" value="org.zezutom.capstone.domain" />
+        <property name="packagesToScan" value="org.zezutom.capstone.model" />
         <property name="loadTimeWeaver">
             <bean class="org.springframework.instrument.classloading.SimpleLoadTimeWeaver" />
         </property>

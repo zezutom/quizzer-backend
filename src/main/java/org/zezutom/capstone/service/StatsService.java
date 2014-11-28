@@ -1,7 +1,7 @@
 package org.zezutom.capstone.service;
 
 import com.google.appengine.api.users.User;
-import org.zezutom.capstone.domain.*;
+import org.zezutom.capstone.model.*;
 
 import java.util.List;
 
