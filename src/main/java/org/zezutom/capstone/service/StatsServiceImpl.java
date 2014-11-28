@@ -3,6 +3,7 @@ package org.zezutom.capstone.service;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,7 +81,7 @@ public class StatsServiceImpl extends GAEService implements StatsService {
 
     @Override
     @ApiMethod(path = "quiz/rating/list", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<QuizRating> getQuizRatings(String quizId) {
+    public List<QuizRating> getQuizRatings(@Named("quizId") String quizId) {
         return quizRatingRepository.findByQuizId(quizId);
     }
 
