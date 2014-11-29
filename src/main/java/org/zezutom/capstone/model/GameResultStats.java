@@ -13,11 +13,11 @@ package org.zezutom.capstone.model;
  *
  * powerUps         The highest number of power-ups the user has ever earned during a single game
  *
- * roundOneRatio    The highest 1st-attempt success ratio the user has ever achieved during a single game
+ * attemptOneRatio    The highest 1st-attempt success ratio the user has ever achieved during a single game
  *
- * roundTwoRatio    The highest 2st-attempt success ratio the user has ever achieved during a single game
+ * attemptTwoRatio    The highest 2st-attempt success ratio the user has ever achieved during a single game
  *
- * roundThreeRatio  The highest 3rd-attempt success ratio the user has ever achieved during a single game
+ * attemptThreeRatio  The highest 3rd-attempt success ratio the user has ever achieved during a single game
  *
  */
 public class GameResultStats extends GenericEntity {
@@ -28,11 +28,11 @@ public class GameResultStats extends GenericEntity {
 
     private int powerUps;
 
-    private int roundOneRatio;
+    private int attemptOneRatio;
 
-    private int roundTwoRatio;
+    private int attemptTwoRatio;
 
-    private int roundThreeRatio;
+    private int attemptThreeRatio;
 
     public int getScore() {
         return score;
@@ -58,28 +58,28 @@ public class GameResultStats extends GenericEntity {
         this.powerUps = powerUps;
     }
 
-    public int getRoundOneRatio() {
-        return roundOneRatio;
+    public int getAttemptOneRatio() {
+        return attemptOneRatio;
     }
 
-    public void setRoundOneRatio(int roundOneRatio) {
-        this.roundOneRatio = roundOneRatio;
+    public void setAttemptOneRatio(int attemptOneRatio) {
+        this.attemptOneRatio = attemptOneRatio;
     }
 
-    public int getRoundTwoRatio() {
-        return roundTwoRatio;
+    public int getAttemptTwoRatio() {
+        return attemptTwoRatio;
     }
 
-    public void setRoundTwoRatio(int roundTwoRatio) {
-        this.roundTwoRatio = roundTwoRatio;
+    public void setAttemptTwoRatio(int attemptTwoRatio) {
+        this.attemptTwoRatio = attemptTwoRatio;
     }
 
-    public int getRoundThreeRatio() {
-        return roundThreeRatio;
+    public int getAttemptThreeRatio() {
+        return attemptThreeRatio;
     }
 
-    public void setRoundThreeRatio(int roundThreeRatio) {
-        this.roundThreeRatio = roundThreeRatio;
+    public void setAttemptThreeRatio(int attemptThreeRatio) {
+        this.attemptThreeRatio = attemptThreeRatio;
     }
 
     @Override
@@ -91,9 +91,9 @@ public class GameResultStats extends GenericEntity {
 
         if (powerUps != userStats.powerUps) return false;
         if (round != userStats.round) return false;
-        if (roundOneRatio != userStats.roundOneRatio) return false;
-        if (roundThreeRatio != userStats.roundThreeRatio) return false;
-        if (roundTwoRatio != userStats.roundTwoRatio) return false;
+        if (attemptOneRatio != userStats.attemptOneRatio) return false;
+        if (attemptThreeRatio != userStats.attemptThreeRatio) return false;
+        if (attemptTwoRatio != userStats.attemptTwoRatio) return false;
         if (score != userStats.score) return false;
 
         return true;
@@ -104,9 +104,9 @@ public class GameResultStats extends GenericEntity {
         int result = score;
         result = 31 * result + round;
         result = 31 * result + powerUps;
-        result = 31 * result + roundOneRatio;
-        result = 31 * result + roundTwoRatio;
-        result = 31 * result + roundThreeRatio;
+        result = 31 * result + attemptOneRatio;
+        result = 31 * result + attemptTwoRatio;
+        result = 31 * result + attemptThreeRatio;
         return result;
     }
 }

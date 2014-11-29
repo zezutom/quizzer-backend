@@ -5,21 +5,17 @@ import javax.persistence.Entity;
 /**
  * A record of an individual completed game.
  *
- * username         Identifies the user
+ * round                The round the user made it to in that particular game
  *
- * timestamp        When and what time was the game completed
+ * score                The achieved score
  *
- * round            The round the user made it to in that particular game
+ * powerUps             The number of power-ups the user has earned during a single game
  *
- * score            The achieved score
+ * attemptOneRatio      The ratio of successful 1st-attempt guesses
  *
- * powerUps         The number of power-ups the user has earned during a single game
+ * attemptTwoRatio      The ratio of successful 2nd-attempt guesses
  *
- * roundOneRatio    The 1st-attempt success ratio the user has achieved during a single game
- *
- * roundTwoRatio    The 2st-attempt success ratio the user has achieved during a single game
- *
- * roundThreeRatio  The 3rd-attempt success ratio the user has achieved during a single game
+ * attemptThreeRatio    The ratio of successful 3rd-attempt guesses
  *
  */
 @Entity
@@ -31,11 +27,11 @@ public class GameResult extends GenericEntity {
 
     private int powerUps;
 
-    private int roundOneRatio;
+    private int attemptOneRatio;
 
-    private int roundTwoRatio;
+    private int attemptTwoRatio;
 
-    private int roundThreeRatio;
+    private int attemptThreeRatio;
 
     public int getRound() {
         return round;
@@ -61,28 +57,28 @@ public class GameResult extends GenericEntity {
         this.powerUps = powerUps;
     }
 
-    public int getRoundOneRatio() {
-        return roundOneRatio;
+    public int getAttemptOneRatio() {
+        return attemptOneRatio;
     }
 
-    public void setRoundOneRatio(int roundOneRatio) {
-        this.roundOneRatio = roundOneRatio;
+    public void setAttemptOneRatio(int attemptOneRatio) {
+        this.attemptOneRatio = attemptOneRatio;
     }
 
-    public int getRoundTwoRatio() {
-        return roundTwoRatio;
+    public int getAttemptTwoRatio() {
+        return attemptTwoRatio;
     }
 
-    public void setRoundTwoRatio(int roundTwoRatio) {
-        this.roundTwoRatio = roundTwoRatio;
+    public void setAttemptTwoRatio(int attemptTwoRatio) {
+        this.attemptTwoRatio = attemptTwoRatio;
     }
 
-    public int getRoundThreeRatio() {
-        return roundThreeRatio;
+    public int getAttemptThreeRatio() {
+        return attemptThreeRatio;
     }
 
-    public void setRoundThreeRatio(int roundThreeRatio) {
-        this.roundThreeRatio = roundThreeRatio;
+    public void setAttemptThreeRatio(int attemptThreeRatio) {
+        this.attemptThreeRatio = attemptThreeRatio;
     }
 
     @Override
@@ -92,11 +88,11 @@ public class GameResult extends GenericEntity {
 
         GameResult that = (GameResult) o;
 
+        if (attemptOneRatio != that.attemptOneRatio) return false;
+        if (attemptThreeRatio != that.attemptThreeRatio) return false;
+        if (attemptTwoRatio != that.attemptTwoRatio) return false;
         if (powerUps != that.powerUps) return false;
         if (round != that.round) return false;
-        if (roundOneRatio != that.roundOneRatio) return false;
-        if (roundThreeRatio != that.roundThreeRatio) return false;
-        if (roundTwoRatio != that.roundTwoRatio) return false;
         if (score != that.score) return false;
 
         return true;
@@ -107,9 +103,9 @@ public class GameResult extends GenericEntity {
         int result = round;
         result = 31 * result + score;
         result = 31 * result + powerUps;
-        result = 31 * result + roundOneRatio;
-        result = 31 * result + roundTwoRatio;
-        result = 31 * result + roundThreeRatio;
+        result = 31 * result + attemptOneRatio;
+        result = 31 * result + attemptTwoRatio;
+        result = 31 * result + attemptThreeRatio;
         return result;
     }
 }

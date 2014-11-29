@@ -12,10 +12,16 @@ public interface GameService {
     /**
      * Saves the result of a single-user game. Requires authentication.
      *
-     * @param user          User authentication
-     * @param gameResult    Game result (score, last round etc.)
+     * @param user                  User authentication
+     * @param round                 Achieved round
+     * @param score                 Total score
+     * @param powerUps              Earned power-ups
+     * @param oneTimeAttempts       The number of first time attempts
+     * @param twoTimeAttempts       The number of second time attempts
+     *
+     * @return                      Game result (score, last round etc.)
      */
-    GameResult saveGameResult(User user, GameResult gameResult);
+    GameResult saveGameResult(User user, int round, int score, int powerUps, int oneTimeAttempts, int twoTimeAttempts);
 
     /**
      * Saves the result of a challenge. Requires authentication.
@@ -23,5 +29,17 @@ public interface GameService {
      * @param user          User authentication
      * @param playoffResult Game result (if the user won or lost, who was the opponent etc.)
      */
-    PlayoffResult savePlayoffResult(User user, PlayoffResult playoffResult);
+
+
+    /**
+     * Saves the result of a challenge. Requires authentication.
+     *
+     * @param user          User authentication
+     * @param opponentId    Opponent's user id
+     * @param round         Achieved round
+     * @param win           The result - true (win), false (loss)
+     *
+     * @return              Playoff result
+     */
+    PlayoffResult savePlayoffResult(User user, String opponentId, int round, boolean win);
 }

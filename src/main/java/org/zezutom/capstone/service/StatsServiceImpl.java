@@ -51,18 +51,18 @@ public class StatsServiceImpl extends GAEService implements StatsService {
             if (gameResult.getScore() > score) score = gameResult.getScore();
             if (gameResult.getRound() > round) round = gameResult.getRound();
             if (gameResult.getPowerUps() > powerUps) powerUps = gameResult.getPowerUps();
-            if (gameResult.getRoundOneRatio() > roundOneRatio) roundOneRatio = gameResult.getRoundOneRatio();
-            if (gameResult.getRoundTwoRatio() > roundTwoRatio) roundTwoRatio = gameResult.getRoundTwoRatio();
-            if (gameResult.getRoundThreeRatio() > roundThreeRatio) roundThreeRatio = gameResult.getRoundThreeRatio();
+            if (gameResult.getAttemptOneRatio() > roundOneRatio) roundOneRatio = gameResult.getAttemptOneRatio();
+            if (gameResult.getAttemptTwoRatio() > roundTwoRatio) roundTwoRatio = gameResult.getAttemptTwoRatio();
+            if (gameResult.getAttemptThreeRatio() > roundThreeRatio) roundThreeRatio = gameResult.getAttemptThreeRatio();
         }
 
         GameResultStats stats = new GameResultStats();
         stats.setScore(score);                      // the best score ever
         stats.setRound(round);                      // the furthest round
         stats.setPowerUps(powerUps);                // the highest number of accumulated power-ups
-        stats.setRoundOneRatio(roundOneRatio);      // the highest percentage of 1st-time attempts
-        stats.setRoundTwoRatio(roundTwoRatio);      // the highest percentage of 2nd-time attempts
-        stats.setRoundThreeRatio(roundThreeRatio);  // the highest percentage of 3rd-time attempts
+        stats.setAttemptOneRatio(roundOneRatio);      // the highest percentage of 1st-time attempts
+        stats.setAttemptTwoRatio(roundTwoRatio);      // the highest percentage of 2nd-time attempts
+        stats.setAttemptThreeRatio(roundThreeRatio);  // the highest percentage of 3rd-time attempts
 
         return stats;
     }

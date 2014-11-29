@@ -48,21 +48,33 @@ public class StatsServiceTest {
 
     @Test
     public void getGameResultStats() {
-        User user = TestUtil.createUser();
-        GameResult coolResult = boostResult(3);
-        GameResult okayResult = boostResult(2);
-        GameResult poorResult = boostResult(1);
+        final User user = TestUtil.createUser();
 
-        gameService.saveGameResult(user, coolResult);
-        gameService.saveGameResult(user, okayResult);
-        gameService.saveGameResult(user, poorResult);
+        GameResult coolResult = createGameResult(30, 10, 4, 8);
+        GameResult okayResult = createGameResult(20, 5, 2, 5);
+        GameResult poorResult = createGameResult(10, 2, 1, 3);
+
+        gameService.saveGameResult(user, coolResult.getRound(), coolResult.getScore(), coolResult.getPowerUps(), 10, 8);
+        gameService.saveGameResult(user, okayResult.getRound(), okayResult.getScore(), okayResult.getPowerUps(), 5, 5);
+        gameService.saveGameResult(user, poorResult.getRound(), poorResult.getScore(), poorResult.getPowerUps(), 2, 3);
 
         GameResultStats stats = statsService.getGameResultStats(user);
+
+        final int expectedAttemptOneRatio = Math.max
+                        (Math.max(coolResult.getAttemptOneRatio(), okayResult.getAttemptOneRatio()),
+                        poorResult.getAttemptOneRatio());
+        final int expectedAttemptTwoRatio = Math.max
+                        (Math.max(coolResult.getAttemptTwoRatio(), okayResult.getAttemptTwoRatio()),
+                        poorResult.getAttemptTwoRatio());
+        final int expectedAttemptThreeRatio = Math.max
+                        (Math.max(coolResult.getAttemptThreeRatio(), okayResult.getAttemptThreeRatio()),
+                        poorResult.getAttemptThreeRatio());
+
         assertThat(stats.getPowerUps(), is(coolResult.getPowerUps()));
         assertThat(stats.getRound(), is(coolResult.getRound()));
-        assertThat(stats.getRoundOneRatio(), is(coolResult.getRoundOneRatio()));
-        assertThat(stats.getRoundTwoRatio(), is(coolResult.getRoundTwoRatio()));
-        assertThat(stats.getRoundThreeRatio(), is(coolResult.getRoundThreeRatio()));
+        assertThat(stats.getAttemptOneRatio(), is(expectedAttemptOneRatio));
+        assertThat(stats.getAttemptTwoRatio(), is(expectedAttemptTwoRatio));
+        assertThat(stats.getAttemptThreeRatio(), is(expectedAttemptThreeRatio));
     }
 
     @Test
@@ -70,9 +82,16 @@ public class StatsServiceTest {
         final int count = 10;
         final User user = TestUtil.createUser();
 
+        final int round = 10;
+        final int oneTimeAttempts = 5;
+        final int oneTimeConsecutiveAttempts = 2;
+        final int twoTimeAttempts = 1;
+
         for (int i = 0; i < count; i++) {
-            GameResult gameResult = TestUtil.createGameResult();
-            assertThat(gameService.saveGameResult(user, gameResult), is(gameResult));
+            GameResult gameResult = createGameResult(round, oneTimeAttempts, oneTimeConsecutiveAttempts, twoTimeAttempts);
+            assertThat(gameService.saveGameResult(user,
+                    round, gameResult.getScore(), gameResult.getPowerUps(),
+                    oneTimeAttempts, twoTimeAttempts), is(gameResult));
         }
 
         List<GameResult> gameResults = statsService.getGameResults(user);
@@ -84,10 +103,12 @@ public class StatsServiceTest {
         final int count = 10;
         final User user = TestUtil.createUser();
         final String opponentId = "Myself";
+        final int round = 10;
+        final boolean win = false;
 
         for (int i = 0; i < count; i++) {
-            PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponentId);
-            assertThat(gameService.savePlayoffResult(user, playoffResult), is(playoffResult));
+            PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponentId, round, win);
+            assertThat(gameService.savePlayoffResult(user, opponentId, round, win), is(playoffResult));
         }
 
         List<PlayoffResult> playOffResults = statsService.getPlayoffResults(user);
@@ -143,16 +164,13 @@ public class StatsServiceTest {
         assertThat(stats.getUpVotes(), is(dislikes));
     }
 
-    private GameResult boostResult(int multiplicator) {
-        GameResult result = TestUtil.createGameResult();
-        result.setPowerUps(result.getPowerUps() * multiplicator);
-        result.setRound(result.getRound() * multiplicator);
-        result.setRoundOneRatio(result.getRoundOneRatio() * multiplicator);
-        result.setRoundTwoRatio(result.getRoundTwoRatio() * multiplicator);
-        result.setRoundThreeRatio(result.getRoundThreeRatio() * multiplicator);
-        result.setScore(result.getScore() * multiplicator);
-
-        return result;
+    private GameResult createGameResult(int round, int oneTimeAttempts, int oneTimeConsecutiveAttempts, int twoTimeAttempts) {
+        return new GameResultBuilder()
+                .setRound(round)
+                .setOneTimeAttempts(oneTimeAttempts)
+                .setOneTimeConsecutiveAttempts(oneTimeConsecutiveAttempts)
+                .setTwoTimeAttempts(twoTimeAttempts)
+                .build();
     }
 
 }

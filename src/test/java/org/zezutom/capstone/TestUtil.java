@@ -22,22 +22,11 @@ public class TestUtil {
         return new User("test@test.com", "test");
     }
 
-    public static GameResult createGameResult() {
-        GameResult gameResult = new GameResult();
-        gameResult.setPowerUps(10);
-        gameResult.setRound(10);
-        gameResult.setRoundOneRatio(10);
-        gameResult.setRoundTwoRatio(10);
-        gameResult.setRoundThreeRatio(10);
-        gameResult.setScore(150);
-        return gameResult;
-    }
-
-    public static PlayoffResult createPlayoffResult(String opponentId) {
+    public static PlayoffResult createPlayoffResult(String opponentId, int round, boolean win) {
         PlayoffResult playoffResult = new PlayoffResult();
         playoffResult.setOpponentId(opponentId);
-        playoffResult.setRound(10);
-        playoffResult.setWin(true);
+        playoffResult.setRound(round);
+        playoffResult.setWin(win);
         return playoffResult;
     }
 
@@ -58,9 +47,9 @@ public class TestUtil {
         userStats.setUserId(user.getUserId());
         userStats.setPowerUps(10);
         userStats.setRound(10);
-        userStats.setRoundOneRatio(25);
-        userStats.setRoundTwoRatio(35);
-        userStats.setRoundThreeRatio(40);
+        userStats.setAttemptOneRatio(25);
+        userStats.setAttemptTwoRatio(35);
+        userStats.setAttemptThreeRatio(40);
         return userStats;
     }
 
@@ -84,10 +73,14 @@ public class TestUtil {
     public static void assertGameResult(GameResult actual, GameResult expected) {
         assertTrue(actual.getPowerUps() == expected.getPowerUps());
         assertTrue(actual.getRound() == expected.getRound());
-        assertTrue(actual.getRoundOneRatio() == expected.getRoundOneRatio());
-        assertTrue(actual.getRoundTwoRatio() == expected.getRoundTwoRatio());
-        assertTrue(actual.getRoundThreeRatio() == expected.getRoundThreeRatio());
+        assertTrue(actual.getAttemptOneRatio() == expected.getAttemptOneRatio());
+        assertTrue(actual.getAttemptTwoRatio() == expected.getAttemptTwoRatio());
+        assertTrue(actual.getAttemptThreeRatio() == expected.getAttemptThreeRatio());
         assertTrue(actual.getScore() == expected.getScore());
+
+        // sanity checks
+        assertThat(actual.getAttemptOneRatio() + actual.getAttemptTwoRatio() + actual.getAttemptThreeRatio(), is(100));
+        assertTrue(actual.getScore() >= actual.getRound());
     }
 
     public static void assertPlayOffResult(PlayoffResult actual, PlayoffResult expected) {

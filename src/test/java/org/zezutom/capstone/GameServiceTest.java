@@ -44,18 +44,34 @@ public class GameServiceTest {
 
     @Test
     public void saveGameResult() {
-        // Save a result of a single game
         final User user = TestUtil.createUser();
-        final GameResult gameResult = TestUtil.createGameResult();
-        TestUtil.assertGameResult(gameService.saveGameResult(user, gameResult), gameResult);
+
+        final int oneTimeAttempts = 4;
+        final int twoTimeAttempts = 2;
+
+        GameResult expected = new GameResultBuilder()
+                                .setRound(10)
+                                .setOneTimeAttempts(oneTimeAttempts)
+                                .setOneTimeConsecutiveAttempts(oneTimeAttempts / 2)
+                                .setTwoTimeAttempts(twoTimeAttempts)
+                                .build();
+        GameResult actual = gameService.saveGameResult(user,
+                expected.getRound(), expected.getScore(), expected.getPowerUps(), oneTimeAttempts, twoTimeAttempts);
+
+        TestUtil.assertGameResult(actual, expected);
     }
 
     @Test
     public void savePlayoffResult() {
         // Save a result of a play-off match
         final User user = TestUtil.createUser();
-        final String opponent = "Test Opponent";
-        final PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponent);
-        TestUtil.assertPlayOffResult(gameService.savePlayoffResult(user, playoffResult), playoffResult);
+
+        // Playoff
+        final String opponentId = "Test Opponent";
+        final int round = 10;
+        final boolean win = true;
+
+        final PlayoffResult playoffResult = TestUtil.createPlayoffResult(opponentId, round, win);
+        TestUtil.assertPlayOffResult(gameService.savePlayoffResult(user, opponentId, round, win), playoffResult);
     }
 }
