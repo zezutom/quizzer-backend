@@ -11,9 +11,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.zezutom.capstone.dao.QuizRatingRepository;
 import org.zezutom.capstone.dao.QuizRepository;
-import org.zezutom.capstone.model.Quiz;
-import org.zezutom.capstone.model.QuizRating;
+import org.zezutom.capstone.model.*;
 import org.zezutom.capstone.service.QuizService;
+
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -63,6 +64,49 @@ public class QuizServiceTest {
     }
 
     @Test
+    public void getByCriteria() {
+        Quiz anEasyJavaQuiz = TestUtil.createQuiz("quiz A", QuizCategory.JAVA, QuizDifficulty.EASY);
+        Quiz anEasyAndroidQuiz = TestUtil.createQuiz("quiz B", QuizCategory.ANDROID, QuizDifficulty.EASY);
+        Quiz aToughJavascriptQuiz = TestUtil.createQuiz("quiz C", QuizCategory.JAVASCRIPT, QuizDifficulty.TOUGH);
+        Quiz aMediumJavaQuiz = TestUtil.createQuiz("quiz D", QuizCategory.JAVA, QuizDifficulty.MEDIUM);
+        Quiz aMediumHTML5Quiz = TestUtil.createQuiz("quiz E", QuizCategory.HTML5, QuizDifficulty.MEDIUM);
+
+        User user = TestUtil.createUser();
+
+        quizService.addNew(user, anEasyJavaQuiz);
+        quizService.addNew(user, anEasyAndroidQuiz);
+        quizService.addNew(user, aToughJavascriptQuiz);
+        quizService.addNew(user, aMediumJavaQuiz);
+        quizService.addNew(user, aMediumHTML5Quiz);
+
+        // All easy ones, category doesn't matter
+        QuizSelectionCriteria criteria = new QuizSelectionCriteria();
+        criteria.addDifficultyLevels(QuizDifficulty.EASY);
+
+        List<Quiz> quizzes = quizService.getByCriteria(criteria);
+        TestUtil.assertEntities(2, quizzes);
+        assertThat(quizzes.get(0).getQuestion(), is(anEasyJavaQuiz.getQuestion()));
+        assertThat(quizzes.get(1).getQuestion(), is(anEasyAndroidQuiz.getQuestion()));
+
+        // Java only, difficulty level doesn't matter
+        criteria = new QuizSelectionCriteria();
+        criteria.addCategories(QuizCategory.JAVA);
+
+        quizzes = quizService.getByCriteria(criteria);
+        TestUtil.assertEntities(2, quizzes);
+        assertThat(quizzes.get(0).getQuestion(), is(anEasyJavaQuiz.getQuestion()));
+        assertThat(quizzes.get(1).getQuestion(), is(aMediumJavaQuiz.getQuestion()));
+
+        // Java, medium difficulty only
+        criteria = new QuizSelectionCriteria();
+        criteria.addCategories(QuizCategory.JAVA);
+        criteria.addDifficultyLevels(QuizDifficulty.MEDIUM);
+        quizzes = quizService.getByCriteria(criteria);
+        TestUtil.assertEntities(1, quizzes);
+        assertThat(quizzes.get(0).getQuestion(), is(aMediumJavaQuiz.getQuestion()));
+    }
+
+    @Test
     public void addNew() {
         User user = TestUtil.createUser();
         Quiz quiz = TestUtil.createQuiz();
@@ -106,11 +150,11 @@ public class QuizServiceTest {
     private void assertQuiz(Quiz actual, Quiz expected) {
         assertTrue(actual.getAnswer() == expected.getAnswer());
         assertThat(actual.getExplanation(), is(expected.getExplanation()));
-        assertThat(actual.getMovieOne(), is(expected.getMovieOne()));
-        assertThat(actual.getMovieTwo(), is(expected.getMovieTwo()));
-        assertThat(actual.getMovieThree(), is(expected.getMovieThree()));
-        assertThat(actual.getMovieFour(), is(expected.getMovieFour()));
-        assertThat(actual.getTitle(), is(expected.getTitle()));
+        assertThat(actual.getOptionOne(), is(expected.getOptionOne()));
+        assertThat(actual.getOptionTwo(), is(expected.getOptionTwo()));
+        assertThat(actual.getOptionThree(), is(expected.getOptionThree()));
+        assertThat(actual.getOptionFour(), is(expected.getOptionFour()));
+        assertThat(actual.getQuestion(), is(expected.getQuestion()));
     }
 
 }

@@ -97,7 +97,7 @@ public class StatsServiceImpl extends GAEService implements StatsService {
                 Quiz quiz = quizRepository.findOne(quizId);
                 stats = new QuizRatingStats();
                 stats.setQuizId(quizId);
-                stats.setTitle(quiz.getTitle());
+                stats.setTitle(quiz.getQuestion());
                 stats.setRatingCount(1);
                 stats.setDownVotes(quizRating.isLiked() ? 0 : 1);
                 stats.setUpVotes(quizRating.isLiked() ? 1 : 0);

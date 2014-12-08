@@ -3,6 +3,7 @@ package org.zezutom.capstone.service;
 import com.google.appengine.api.users.User;
 import org.zezutom.capstone.model.Quiz;
 import org.zezutom.capstone.model.QuizRating;
+import org.zezutom.capstone.model.QuizSelectionCriteria;
 
 import java.util.List;
 
@@ -17,6 +18,13 @@ public interface QuizService {
      * @return  all of the active quizzes or an empty list if there is no data
      */
     List<Quiz> getAll();
+
+    /**
+     *
+     * @param criteria
+     * @return
+     */
+    List<Quiz> getByCriteria(QuizSelectionCriteria criteria);
 
     /**
      * Allows to add a new quiz. Requires authentication.

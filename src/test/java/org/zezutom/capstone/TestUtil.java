@@ -31,14 +31,19 @@ public class TestUtil {
     }
 
     public static Quiz createQuiz() {
-        Quiz quiz = new Quiz();
+        return createQuiz(null, QuizCategory.ANDROID, QuizDifficulty.EASY);
+    }
+
+    public static Quiz createQuiz(String title, QuizCategory category, QuizDifficulty difficulty) {
+        Quiz quiz = new Quiz(title);
         quiz.setAnswer(1);
-        quiz.setDifficulty(3);
         quiz.setExplanation("test");
-        quiz.setMovieOne("Movie One");
-        quiz.setMovieTwo("Movie Two");
-        quiz.setMovieThree("Movie Three");
-        quiz.setMovieFour("Movie Four");
+        quiz.setOptionOne("Option One");
+        quiz.setOptionTwo("Option Two");
+        quiz.setOptionThree("Option Three");
+        quiz.setOptionFour("Option Four");
+        quiz.setCategory(category);
+        quiz.setDifficulty(difficulty);
         return quiz;
     }
 

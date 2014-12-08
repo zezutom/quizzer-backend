@@ -1,6 +1,8 @@
 package org.zezutom.capstone.model;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 /**
  * A quiz comprises four different movie titles, one of which being the odd one.
@@ -10,87 +12,95 @@ import javax.persistence.*;
  * title        Helps to identify the quiz, it should capture the essence of the puzzle. Should only
  *              be shown on the quiz stats screen, since it could give a user a hint.
  *
- * movieOne     First movie title
+ * optionOne     First movie title
  *
- * movieTwo     Second movie title
+ * optionTwo     Second movie title
  *
- * movieThree   Third movie title
+ * optionThree   Third movie title
  *
- * movieFour    Fourth movie title
+ * optionFour    Fourth movie title
  *
- * answer       Identifies the odd title (1 to 4)
+ * answer        Identifies the correct choice
  *
  * explanation  Explains the reasoning for the answer
  *
- * difficulty   How difficult the game set is considered to be, scale 1 (easy) to 5 (tough)
+ * difficulty   How difficult the game set is considered to be (easy, medium, tough)
  *
  */
 @Entity
 public class Quiz extends GenericEntity {
 
-    private String title;
+    private String question;
 
-    private String movieOne;
+    private String optionOne;
 
-    private String movieTwo;
+    private String optionTwo;
 
-    private String movieThree;
+    private String optionThree;
 
-    private String movieFour;
+    private String optionFour;
 
-    private int answer;
+    private Integer answer;
 
     private String explanation;
 
-    private int difficulty;
+    @Enumerated(EnumType.ORDINAL)
+    private QuizDifficulty difficulty;
+
+    @Enumerated(EnumType.ORDINAL)
+    private QuizCategory category;
 
     public Quiz() {}
 
-    public Quiz(String title) {
-        this.title = title;
+    public Quiz(String question) {
+        this.question = question;
     }
 
-    public String getTitle() {
-        return title;
+    public String getQuestion() {
+        return question;
     }
 
-    public String getMovieOne() {
-        return movieOne;
+    public void setQuestion(String title) {
+        this.question = title;
     }
 
-    public void setMovieOne(String movieOne) {
-        this.movieOne = movieOne;
+    public String getOptionOne() {
+        return optionOne;
     }
 
-    public String getMovieTwo() {
-        return movieTwo;
+    public void setOptionOne(String optionOne) {
+        this.optionOne = optionOne;
     }
 
-    public void setMovieTwo(String movieTwo) {
-        this.movieTwo = movieTwo;
+    public String getOptionTwo() {
+        return optionTwo;
     }
 
-    public String getMovieThree() {
-        return movieThree;
+    public void setOptionTwo(String movieTwo) {
+        this.optionTwo = movieTwo;
     }
 
-    public void setMovieThree(String movieThree) {
-        this.movieThree = movieThree;
+    public String getOptionThree() {
+        return optionThree;
     }
 
-    public String getMovieFour() {
-        return movieFour;
+    public void setOptionThree(String movieThree) {
+        this.optionThree = movieThree;
     }
 
-    public void setMovieFour(String movieFour) {
-        this.movieFour = movieFour;
+    public String getOptionFour() {
+        return optionFour;
     }
 
-    public int getAnswer() {
+    public void setOptionFour(String movieFour) {
+        this.optionFour = movieFour;
+    }
+
+    public Integer getAnswer() {
         return answer;
     }
 
-    public void setAnswer(int answer) {
+    public void setAnswer(Integer answer) {
         this.answer = answer;
     }
 
@@ -102,12 +112,20 @@ public class Quiz extends GenericEntity {
         this.explanation = explanation;
     }
 
-    public int getDifficulty() {
+    public QuizDifficulty getDifficulty() {
         return difficulty;
     }
 
-    public void setDifficulty(int difficulty) {
+    public void setDifficulty(QuizDifficulty difficulty) {
         this.difficulty = difficulty;
+    }
+
+    public QuizCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(QuizCategory category) {
+        this.category = category;
     }
 
     @Override
@@ -117,29 +135,26 @@ public class Quiz extends GenericEntity {
 
         Quiz quiz = (Quiz) o;
 
-        if (answer != quiz.answer) return false;
-        if (difficulty != quiz.difficulty) return false;
+        if (answer != null ? !answer.equals(quiz.answer) : quiz.answer != null) return false;
         if (explanation != null ? !explanation.equals(quiz.explanation) : quiz.explanation != null) return false;
-        if (movieFour != null ? !movieFour.equals(quiz.movieFour) : quiz.movieFour != null) return false;
-        if (movieOne != null ? !movieOne.equals(quiz.movieOne) : quiz.movieOne != null) return false;
-        if (movieThree != null ? !movieThree.equals(quiz.movieThree) : quiz.movieThree != null) return false;
-        if (movieTwo != null ? !movieTwo.equals(quiz.movieTwo) : quiz.movieTwo != null) return false;
-        if (title != null ? !title.equals(quiz.title) : quiz.title != null) return false;
+        if (optionFour != null ? !optionFour.equals(quiz.optionFour) : quiz.optionFour != null) return false;
+        if (optionOne != null ? !optionOne.equals(quiz.optionOne) : quiz.optionOne != null) return false;
+        if (optionThree != null ? !optionThree.equals(quiz.optionThree) : quiz.optionThree != null) return false;
+        if (optionTwo != null ? !optionTwo.equals(quiz.optionTwo) : quiz.optionTwo != null) return false;
+        if (question != null ? !question.equals(quiz.question) : quiz.question != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (movieOne != null ? movieOne.hashCode() : 0);
-        result = 31 * result + (movieTwo != null ? movieTwo.hashCode() : 0);
-        result = 31 * result + (movieThree != null ? movieThree.hashCode() : 0);
-        result = 31 * result + (movieFour != null ? movieFour.hashCode() : 0);
-        result = 31 * result + answer;
+        int result = question != null ? question.hashCode() : 0;
+        result = 31 * result + (optionOne != null ? optionOne.hashCode() : 0);
+        result = 31 * result + (optionTwo != null ? optionTwo.hashCode() : 0);
+        result = 31 * result + (optionThree != null ? optionThree.hashCode() : 0);
+        result = 31 * result + (optionFour != null ? optionFour.hashCode() : 0);
+        result = 31 * result + (answer != null ? answer.hashCode() : 0);
         result = 31 * result + (explanation != null ? explanation.hashCode() : 0);
-        result = 31 * result + difficulty;
-
         return result;
     }
 }

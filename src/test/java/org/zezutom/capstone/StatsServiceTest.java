@@ -158,7 +158,7 @@ public class StatsServiceTest {
 
         QuizRatingStats stats = statsList.get(0);
         assertThat(stats.getQuizId(), is(quiz.getId()));
-        assertThat(stats.getTitle(), is(quiz.getTitle()));
+        assertThat(stats.getTitle(), is(quiz.getQuestion()));
         assertThat(stats.getRatingCount(), is(count));
         assertThat(stats.getDownVotes(), is(likes));
         assertThat(stats.getUpVotes(), is(dislikes));
