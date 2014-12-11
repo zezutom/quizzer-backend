@@ -79,7 +79,7 @@ public class QuizServiceImpl extends GAEService implements QuizService {
         StringBuilder sb = new StringBuilder();
         sb.append("(");
         for (T item : enumList) {
-            sb.append(item.ordinal()).append(",");
+            sb.append("'").append(item.name()).append("',");
         }
         sb.setLength(sb.length() - 1);
         sb.append(")");

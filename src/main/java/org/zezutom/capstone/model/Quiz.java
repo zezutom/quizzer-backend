@@ -44,10 +44,10 @@ public class Quiz extends GenericEntity {
 
     private String explanation;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private QuizDifficulty difficulty;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private QuizCategory category;
 
     public Quiz() {}

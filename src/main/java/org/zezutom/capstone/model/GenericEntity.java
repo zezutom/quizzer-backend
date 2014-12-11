@@ -16,7 +16,7 @@ public abstract class GenericEntity implements Serializable {
     private String id;
 
     @Version
-    private Integer version;
+    private Long version;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
@@ -27,7 +27,7 @@ public abstract class GenericEntity implements Serializable {
         return id;
     }
 
-    public Integer getVersion() {
+    public Long getVersion() {
         return version;
     }
 
