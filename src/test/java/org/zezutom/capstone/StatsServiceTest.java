@@ -95,7 +95,7 @@ public class StatsServiceTest {
         }
 
         List<GameResult> gameResults = statsService.getGameResults(user);
-        TestUtil.assertEntities(count, gameResults);
+        TestUtil.assertEntities(count, gameResults, user);
     }
 
     @Test

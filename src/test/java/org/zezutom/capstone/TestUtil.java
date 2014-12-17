@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.zezutom.capstone.model.*;
+import org.zezutom.capstone.util.AppUtil;
 
 import java.util.List;
 
@@ -59,12 +60,16 @@ public class TestUtil {
     }
 
     public static<T extends GenericEntity> void assertEntities(int expectedSize, List<T> entities) {
+        assertEntities(expectedSize, entities, null);
+    }
+
+    public static<T extends GenericEntity> void assertEntities(int expectedSize, List<T> entities, User user) {
         assertNotNull(entities);
         assertTrue(entities.size() == expectedSize);
         for (T entity : entities) {
             assertEntity(entity);
+            if (user != null) assertThat(entity.getUserId(), is(user.getEmail()));
         }
-
     }
 
     public static<T extends GenericEntity> void assertEntity(T entity) {
