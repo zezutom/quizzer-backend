@@ -6,11 +6,11 @@
 
     <persistence-unit name="jpa.unit" transaction-type="RESOURCE_LOCAL">
         <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
-        <class>org.zezutom.capstone.model.GenericEntity</class>
-        <class>org.zezutom.capstone.model.GameResult</class>
-        <class>org.zezutom.capstone.model.PlayoffResult</class>
-        <class>org.zezutom.capstone.model.Quiz</class>
-        <class>org.zezutom.capstone.model.QuizRating</class>
+        <class>org.zezutom.quizzer.model.GenericEntity</class>
+        <class>org.zezutom.quizzer.model.GameResult</class>
+        <class>org.zezutom.quizzer.model.PlayoffResult</class>
+        <class>org.zezutom.quizzer.model.Quiz</class>
+        <class>org.zezutom.quizzer.model.QuizRating</class>
         <exclude-unlisted-classes />
         <properties>
             <property name="datanucleus.ConnectionURL" value="appengine"/>

@@ -10,9 +10,9 @@
 
     <context:annotation-config />
 
-    <context:component-scan base-package="org.zezutom.capstone.service" />
+    <context:component-scan base-package="org.zezutom.quizzer.service" />
 
-    <jpa:repositories base-package="org.zezutom.capstone.dao"
+    <jpa:repositories base-package="org.zezutom.quizzer.dao"
                       transaction-manager-ref="transactionManager"
                       entity-manager-factory-ref="entityManagerFactory"/>
 
@@ -24,7 +24,7 @@
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="persistenceUnitName" value="jpa.unit" />
-        <property name="packagesToScan" value="org.zezutom.capstone.model" />
+        <property name="packagesToScan" value="org.zezutom.quizzer.model" />
         <property name="loadTimeWeaver">
             <bean class="org.springframework.instrument.classloading.SimpleLoadTimeWeaver" />
         </property>
