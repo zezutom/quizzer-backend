@@ -22,14 +22,6 @@ public class TestUtil {
         return new User("test@test.com", "test");
     }
 
-    public static PlayoffResult createPlayoffResult(String opponentId, int round, boolean win) {
-        PlayoffResult playoffResult = new PlayoffResult();
-        playoffResult.setOpponentId(opponentId);
-        playoffResult.setRound(round);
-        playoffResult.setWin(win);
-        return playoffResult;
-    }
-
     public static Quiz createQuiz() {
         return createQuiz(null, QuizCategory.ANDROID, QuizDifficulty.EASY);
     }
@@ -90,11 +82,6 @@ public class TestUtil {
         // sanity checks
         assertThat(actual.getAttemptOneRatio() + actual.getAttemptTwoRatio() + actual.getAttemptThreeRatio(), is(100));
         assertTrue(actual.getScore() >= actual.getRound());
-    }
-
-    public static void assertPlayOffResult(PlayoffResult actual, PlayoffResult expected) {
-        assertThat(actual.getOpponentId(), is(expected.getOpponentId()));
-        assertTrue(actual.getRound() == expected.getRound());
     }
 
     public static LocalServiceTestHelper getDatastoreTestHelper() {

@@ -16,10 +16,11 @@ public interface QuizzerService {
      * @param powerUps              Earned power-ups
      * @param oneTimeAttempts       The number of first time attempts
      * @param twoTimeAttempts       The number of second time attempts
+     * @param email                 User's email as a temporary user id, since I couldn't get OAUTH2 working
      *
      * @return                      Game result (score, last round etc.)
      */
-    GameResult saveGameResult(User user, int round, int score, int powerUps, int oneTimeAttempts, int twoTimeAttempts);
+    GameResult saveGameResult(User user, int round, int score, int powerUps, int oneTimeAttempts, int twoTimeAttempts, String email);
 
     /**
      * Provides a list of all available quizzes.
@@ -49,25 +50,28 @@ public interface QuizzerService {
      * @param user      User authentication
      * @param quizId    Identifies the rated quiz
      * @param liked     true if the user liked the quiz, false otherwise
+     * @param email     User's email as a temporary user id, since I couldn't get OAUTH2 working
      *
-     * @return the creŒated rating
+     * @return the created rating
      */
-    QuizRating rateQuiz(User user, String quizId, boolean liked);
+    QuizRating rateQuiz(User user, String quizId, boolean liked, String email);
 
     /**
      * Fetches user's highest rankings.
      *
      * @param user      User authentication
+     * @param email     User's email as a temporary user id, since I couldn't get OAUTH2 working
      * @return  rankings summmary
      */
-    GameResultStats getGameResultStats(User user);
+    GameResultStats getGameResultStats(User user, String email);
 
     /**
-     *
-     * @param user
+     * Fetches user's gaming history
+     * @param user      User authentication
+     * @param email     User's email as a temporary user id, since I couldn't get OAUTH2 working
      * @return
      */
-    List<GameResult> getGameResults(User user);
+    List<GameResult> getGameResults(User user, String email);
 
     /**
      * List of individual quiz ratings

@@ -18,6 +18,8 @@ public class GameResultBuilder {
 
     private int oneTimeConsecutiveAttempts;
 
+    private String email;
+
     /**
      * The number of first-time consecutive attempts needed to earn a power-up
      */
@@ -45,6 +47,11 @@ public class GameResultBuilder {
         return this;
     }
 
+    public GameResultBuilder setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
     public GameResult build() {
 
         if (oneTimeAttempts + twoTimeAttempts > round) {
@@ -55,6 +62,7 @@ public class GameResultBuilder {
             throw new IllegalStateException("The number of consecutive successful attempts exceeds the total number of first time attempts!");
         }
 
+        gameResult.setEmail(email);
         gameResult.setRound(round);
         gameResult.setScore(firstAttemptPoints * oneTimeAttempts    +
                             secondAttemptPoints * twoTimeAttempts   +

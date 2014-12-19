@@ -8,7 +8,6 @@
         <provider>org.datanucleus.api.jpa.PersistenceProviderImpl</provider>
         <class>org.zezutom.quizzer.model.GenericEntity</class>
         <class>org.zezutom.quizzer.model.GameResult</class>
-        <class>org.zezutom.quizzer.model.PlayoffResult</class>
         <class>org.zezutom.quizzer.model.Quiz</class>
         <class>org.zezutom.quizzer.model.QuizRating</class>
         <exclude-unlisted-classes />

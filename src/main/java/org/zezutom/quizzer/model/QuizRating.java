@@ -12,6 +12,8 @@ public class QuizRating extends GenericEntity {
 
     private boolean liked;
 
+    private String email;
+
     public boolean isLiked() {
         return liked;
     }
@@ -28,6 +30,14 @@ public class QuizRating extends GenericEntity {
         this.quizId = quizId;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,15 +46,17 @@ public class QuizRating extends GenericEntity {
         QuizRating that = (QuizRating) o;
 
         if (liked != that.liked) return false;
-        if (!quizId.equals(that.quizId)) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        if (quizId != null ? !quizId.equals(that.quizId) : that.quizId != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = quizId.hashCode();
+        int result = quizId != null ? quizId.hashCode() : 0;
         result = 31 * result + (liked ? 1 : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
     }
 }

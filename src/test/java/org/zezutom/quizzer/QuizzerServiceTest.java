@@ -16,9 +16,7 @@ import org.zezutom.quizzer.service.QuizzerService;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring-servlet.xml")
@@ -58,7 +56,7 @@ public class QuizzerServiceTest {
                 .setTwoTimeAttempts(twoTimeAttempts)
                 .build();
         GameResult actual = service.saveGameResult(user,
-                expected.getRound(), expected.getScore(), expected.getPowerUps(), oneTimeAttempts, twoTimeAttempts);
+                expected.getRound(), expected.getScore(), expected.getPowerUps(), oneTimeAttempts, twoTimeAttempts, user.getEmail());
 
         TestUtil.assertGameResult(actual, expected);
     }
@@ -135,7 +133,8 @@ public class QuizzerServiceTest {
         Quiz quiz = saveAndGetQuiz();
 
         // Let a user like it
-        QuizRating quizRating = service.rateQuiz(TestUtil.createUser(), quiz.getId(), true);
+        User user = TestUtil.createUser();
+        QuizRating quizRating = service.rateQuiz(user, quiz.getId(), true, user.getEmail());
 
         // Verify it's got up-voted
         assertRating(quizRating, true);
@@ -147,7 +146,8 @@ public class QuizzerServiceTest {
         Quiz quiz = saveAndGetQuiz();
 
         // Let a user dislike it
-        QuizRating quizRating = service.rateQuiz(TestUtil.createUser(), quiz.getId(), false);
+        User user = TestUtil.createUser();
+        QuizRating quizRating = service.rateQuiz(user, quiz.getId(), false, user.getEmail());
 
         // Verify it's got down-voted
         assertRating(quizRating, false);
@@ -156,16 +156,17 @@ public class QuizzerServiceTest {
     @Test
     public void getGameResultStats() {
         final User user = TestUtil.createUser();
+        final String email = user.getEmail();
 
         GameResult coolResult = createGameResult(30, 10, 4, 8);
         GameResult okayResult = createGameResult(20, 5, 2, 5);
         GameResult poorResult = createGameResult(10, 2, 1, 3);
 
-        service.saveGameResult(user, coolResult.getRound(), coolResult.getScore(), coolResult.getPowerUps(), 10, 8);
-        service.saveGameResult(user, okayResult.getRound(), okayResult.getScore(), okayResult.getPowerUps(), 5, 5);
-        service.saveGameResult(user, poorResult.getRound(), poorResult.getScore(), poorResult.getPowerUps(), 2, 3);
+        service.saveGameResult(user, coolResult.getRound(), coolResult.getScore(), coolResult.getPowerUps(), 10, 8, email);
+        service.saveGameResult(user, okayResult.getRound(), okayResult.getScore(), okayResult.getPowerUps(), 5, 5, email);
+        service.saveGameResult(user, poorResult.getRound(), poorResult.getScore(), poorResult.getPowerUps(), 2, 3, email);
 
-        GameResultStats stats = service.getGameResultStats(user);
+        GameResultStats stats = service.getGameResultStats(user, email);
 
         final int expectedAttemptOneRatio = Math.max
                 (Math.max(coolResult.getAttemptOneRatio(), okayResult.getAttemptOneRatio()),
@@ -196,12 +197,13 @@ public class QuizzerServiceTest {
 
         for (int i = 0; i < count; i++) {
             GameResult gameResult = createGameResult(round, oneTimeAttempts, oneTimeConsecutiveAttempts, twoTimeAttempts);
-            assertThat(service.saveGameResult(user,
+            GameResult actual = service.saveGameResult(user,
                     round, gameResult.getScore(), gameResult.getPowerUps(),
-                    oneTimeAttempts, twoTimeAttempts), is(gameResult));
+                    oneTimeAttempts, twoTimeAttempts, user.getEmail());
+            assertThat(actual, is(gameResult));
         }
 
-        List<GameResult> gameResults = service.getGameResults(user);
+        List<GameResult> gameResults = service.getGameResults(user, user.getEmail());
         TestUtil.assertEntities(count, gameResults, user);
     }
 
@@ -214,7 +216,7 @@ public class QuizzerServiceTest {
         Quiz quiz = service.getQuizzes().get(0);
 
         for (int i = 0; i < count; i++) {
-            assertNotNull(service.rateQuiz(user, quiz.getId(), i % 2 == 0));
+            assertNotNull(service.rateQuiz(user, quiz.getId(), i % 2 == 0, user.getEmail()));
         }
 
         List<QuizRating> quizRatings = service.getQuizRatings(quiz.getId());
@@ -239,7 +241,7 @@ public class QuizzerServiceTest {
         for (int i = 0; i < count; i++) {
             boolean liked = i % 2 == 0;
             if (liked) likes++; else dislikes++;
-            assertNotNull(service.rateQuiz(user, quiz.getId(), liked));
+            assertNotNull(service.rateQuiz(user, quiz.getId(), liked, user.getEmail()));
         }
 
         List<QuizRatingStats> statsList = service.getQuizRatingStats();
@@ -272,6 +274,7 @@ public class QuizzerServiceTest {
     private void assertRating(QuizRating quizRating, boolean liked) {
         TestUtil.assertEntity(quizRating);
         assertThat(quizRating.isLiked(), is(liked));
+        assertThat(quizRating.getEmail(), is(TestUtil.createUser().getEmail()));
     }
 
     private GameResult createGameResult(int round, int oneTimeAttempts, int oneTimeConsecutiveAttempts, int twoTimeAttempts) {
@@ -280,6 +283,7 @@ public class QuizzerServiceTest {
                 .setOneTimeAttempts(oneTimeAttempts)
                 .setOneTimeConsecutiveAttempts(oneTimeConsecutiveAttempts)
                 .setTwoTimeAttempts(twoTimeAttempts)
+                .setEmail(TestUtil.createUser().getEmail())
                 .build();
     }
 

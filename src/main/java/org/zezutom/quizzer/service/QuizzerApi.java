@@ -50,14 +50,20 @@ public class QuizzerApi extends GAEService implements QuizzerService {
                                      @Named("score") int score,
                                      @Named("powerUps") int powerUps,
                                      @Named("oneTimeAttempts") int oneTimeAttempts,
-                                     @Named("twoTimeAttempts") int twoTimeAttempts) {
+                                     @Named("twoTimeAttempts") int twoTimeAttempts,
+                                     @Named("email") String email) {
         GameResult gameResult = new GameResult();
+        gameResult.setEmail(email);
         gameResult.setRound(round);
         gameResult.setScore(score);
         gameResult.setPowerUps(powerUps);
         gameResult.setAttemptOneRatio(getRatio(round, oneTimeAttempts));
         gameResult.setAttemptTwoRatio(getRatio(round, twoTimeAttempts));
-        gameResult.setAttemptThreeRatio(getRatio(round, round - oneTimeAttempts - twoTimeAttempts));
+
+        if (round <= 1) gameResult.setAttemptThreeRatio(0);
+        else {
+            gameResult.setAttemptThreeRatio(getRatio(round, round - oneTimeAttempts - twoTimeAttempts));
+        }
 
         return gameResultRepository.save(gameResult);
     }
@@ -88,20 +94,21 @@ public class QuizzerApi extends GAEService implements QuizzerService {
 
     @Override
     @ApiMethod(path = "quiz/rate", httpMethod = ApiMethod.HttpMethod.POST)
-    public QuizRating rateQuiz(User user, @Named("quizId") String quizId, @Named("liked") boolean liked) {
+    public QuizRating rateQuiz(User user, @Named("quizId") String quizId, @Named("liked") boolean liked, @Named("email") String email) {
         QuizRating rating = new QuizRating();
         rating.setQuizId(quizId);
         rating.setLiked(liked);
+        rating.setEmail(email);
         return quizRatingRepository.save(rating);
     }
 
     @Override
     @ApiMethod(path = "game/result/stats/get", httpMethod = ApiMethod.HttpMethod.GET)
-    public GameResultStats getGameResultStats(User user) {
+    public GameResultStats getGameResultStats(User user, @Named("email") String email) {
         int score, round, powerUps, roundOneRatio, roundTwoRatio, roundThreeRatio;
         score = round = powerUps = roundOneRatio = roundTwoRatio = roundThreeRatio = 0;
 
-        for (GameResult gameResult : getGameResults(user)) {
+        for (GameResult gameResult : getGameResults(user, email)) {
             if (gameResult.getScore() > score) score = gameResult.getScore();
             if (gameResult.getRound() > round) round = gameResult.getRound();
             if (gameResult.getPowerUps() > powerUps) powerUps = gameResult.getPowerUps();
@@ -111,6 +118,7 @@ public class QuizzerApi extends GAEService implements QuizzerService {
         }
 
         GameResultStats stats = new GameResultStats();
+        stats.setEmail(email);
         stats.setScore(score);                          // the best score ever
         stats.setRound(round);                          // the furthest round
         stats.setPowerUps(powerUps);                    // the highest number of accumulated power-ups
@@ -123,8 +131,8 @@ public class QuizzerApi extends GAEService implements QuizzerService {
 
     @Override
     @ApiMethod(path = "game/result/list", httpMethod = ApiMethod.HttpMethod.GET)
-    public List<GameResult> getGameResults(User user) {
-        return gameResultRepository.findByUserId(AppUtil.getUserId());
+    public List<GameResult> getGameResults(User user, @Named("email") String email) {
+        return gameResultRepository.findByEmail(email);
     }
 
     @Override

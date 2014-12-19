@@ -34,6 +34,8 @@ public class GameResultStats extends GenericEntity {
 
     private int attemptThreeRatio;
 
+    private String email;
+
     public int getScore() {
         return score;
     }
@@ -82,19 +84,28 @@ public class GameResultStats extends GenericEntity {
         this.attemptThreeRatio = attemptThreeRatio;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GameResultStats)) return false;
 
-        GameResultStats userStats = (GameResultStats) o;
+        GameResultStats that = (GameResultStats) o;
 
-        if (powerUps != userStats.powerUps) return false;
-        if (round != userStats.round) return false;
-        if (attemptOneRatio != userStats.attemptOneRatio) return false;
-        if (attemptThreeRatio != userStats.attemptThreeRatio) return false;
-        if (attemptTwoRatio != userStats.attemptTwoRatio) return false;
-        if (score != userStats.score) return false;
+        if (attemptOneRatio != that.attemptOneRatio) return false;
+        if (attemptThreeRatio != that.attemptThreeRatio) return false;
+        if (attemptTwoRatio != that.attemptTwoRatio) return false;
+        if (powerUps != that.powerUps) return false;
+        if (round != that.round) return false;
+        if (score != that.score) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
 
         return true;
     }
@@ -107,6 +118,7 @@ public class GameResultStats extends GenericEntity {
         result = 31 * result + attemptOneRatio;
         result = 31 * result + attemptTwoRatio;
         result = 31 * result + attemptThreeRatio;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
     }
 }

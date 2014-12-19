@@ -33,6 +33,8 @@ public class GameResult extends GenericEntity {
 
     private int attemptThreeRatio;
 
+    private String email;
+
     public int getRound() {
         return round;
     }
@@ -81,6 +83,14 @@ public class GameResult extends GenericEntity {
         this.attemptThreeRatio = attemptThreeRatio;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,6 +104,7 @@ public class GameResult extends GenericEntity {
         if (powerUps != that.powerUps) return false;
         if (round != that.round) return false;
         if (score != that.score) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
 
         return true;
     }
@@ -106,6 +117,20 @@ public class GameResult extends GenericEntity {
         result = 31 * result + attemptOneRatio;
         result = 31 * result + attemptTwoRatio;
         result = 31 * result + attemptThreeRatio;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append(email)
+                .append(":").append("[")
+                .append(round).append("|")
+                .append(score).append("|")
+                .append(attemptOneRatio).append("|")
+                .append(attemptTwoRatio).append("|")
+                .append(attemptThreeRatio).append("]")
+                .toString();
     }
 }
