@@ -1,7 +1,7 @@
-Backend for a simple quiz game called Quizzer
-=============================================
+Backend for a simple quiz game
+==============================
 
-Provides API to [Quizzer for Android](https://github.com/zezutom/quizzer-android)
+Provides a light-weight JSON API to [Quizzer for Android](https://github.com/zezutom/quizzer-android)
 
 Features
 --------
