@@ -15,10 +15,6 @@ public class AppUtil {
 
     public static final String API_VERSION = "v3";
 
-    public static final String DATE_REGEX = "^\\d{4}-\\d{2}-\\d{2}$";
-
-    public static final String RATING_REGEX = "^\\d*\\.?\\d+$";
-
     private static final Random RANDOM = new Random();
 
     private AppUtil() {}

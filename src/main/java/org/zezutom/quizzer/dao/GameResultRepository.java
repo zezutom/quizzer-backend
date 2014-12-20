@@ -8,5 +8,5 @@ public interface GameResultRepository extends GenericEntityRepository<GameResult
 
     // List<GameResult> findByUserId(String userId);
 
-    List<GameResult> findByEmail(String email);
+    List<GameResult> findByEmailOrderByCreatedAtDesc(String email);
 }

@@ -132,7 +132,7 @@ public class QuizzerApi extends GAEService implements QuizzerService {
     @Override
     @ApiMethod(path = "game/result/list", httpMethod = ApiMethod.HttpMethod.GET)
     public List<GameResult> getGameResults(User user, @Named("email") String email) {
-        return gameResultRepository.findByEmail(email);
+        return gameResultRepository.findByEmailOrderByCreatedAtDesc(email);
     }
 
     @Override

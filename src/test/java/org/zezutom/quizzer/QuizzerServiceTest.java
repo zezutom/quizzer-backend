@@ -9,10 +9,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.zezutom.quizzer.dao.GameResultRepository;
 import org.zezutom.quizzer.dao.QuizRepository;
 import org.zezutom.quizzer.model.*;
 import org.zezutom.quizzer.service.QuizzerService;
 
+import java.util.Calendar;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -27,6 +29,9 @@ public class QuizzerServiceTest {
 
     @Autowired
     private QuizRepository quizRepository;
+
+    @Autowired
+    private GameResultRepository gameResultRepository;
 
     private final LocalServiceTestHelper helper = TestUtil.getDatastoreTestHelper();
 
@@ -208,6 +213,27 @@ public class QuizzerServiceTest {
     }
 
     @Test
+    public void getGameResults_orderedByTimestampDesc() {
+
+        GameResult young = createGameResult(5);
+        GameResult younger = createGameResult(10);
+        GameResult youngest = createGameResult(15);
+
+        for (GameResult result : new GameResult[] {young, younger, youngest}) {
+            gameResultRepository.save(result);
+        }
+
+        User user = TestUtil.createUser();
+
+        List<GameResult> orderedResults = service.getGameResults(user, user.getEmail());
+        TestUtil.assertEntities(3, orderedResults);
+
+        assertThat(orderedResults.get(0), is(youngest));
+        assertThat(orderedResults.get(1), is(younger));
+        assertThat(orderedResults.get(2), is(young));
+    }
+
+    @Test
     public void getQuizRatings() {
         final int count = 10;
         final User user = TestUtil.createUser();
@@ -275,6 +301,14 @@ public class QuizzerServiceTest {
         TestUtil.assertEntity(quizRating);
         assertThat(quizRating.isLiked(), is(liked));
         assertThat(quizRating.getEmail(), is(TestUtil.createUser().getEmail()));
+    }
+
+    private GameResult createGameResult(int secondsFromNow) {
+        GameResult result = createGameResult(3, 1, 1, 1);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.SECOND, secondsFromNow);
+        result.setCreatedAt(calendar.getTime());
+        return result;
     }
 
     private GameResult createGameResult(int round, int oneTimeAttempts, int oneTimeConsecutiveAttempts, int twoTimeAttempts) {
