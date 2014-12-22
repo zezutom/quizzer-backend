@@ -6,7 +6,7 @@
     <version>1.1</version>
 
     <groupId>org.zezutom.capstone</groupId>
-    <artifactId>mutibo</artifactId>
+    <artifactId>quizzer-backend</artifactId>
 
     <properties>
         <appengine.app.version>1</appengine.app.version>
